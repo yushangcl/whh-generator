@@ -1,0 +1,72 @@
+package ${voPackage};
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import ${commonPackage}.util.DateUtil;
+import ${beanPackage}.${tableInfo.beanName};
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.BeanUtils;
+
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * ${tableInfo.beanName}Vo
+ *
+ * @author ${authorName} (;￢＿￢) 
+ * @version ${version}
+ * @date $date
+ **/
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class ${tableInfo.beanName}Vo extends ${tableInfo.beanName} {
+    /**
+     * 显示创建时间
+     **/
+    private String displayCreateTime;
+
+    /**
+     * 显示更新时间
+     **/
+    private String displayUpdateTime;
+
+    /**
+     * 显示创建人
+     **/
+    private String displayCreateUser;
+
+    /**
+     * 显示更新人
+     **/
+    private String displayUpdateUser;
+
+    /**
+     * 开始时间
+     */
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date startTime;
+
+    /**
+     * 结束时间
+     */
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endTime;
+
+
+    public ${tableInfo.beanName}Vo() {
+    }
+
+    public ${tableInfo.beanName}Vo(${tableInfo.beanName} pojo) {
+        if (null != pojo) {
+            BeanUtils.copyProperties(pojo, this);
+            this.setDisplayCreateTime(DateUtil.format(pojo.getCreateTime(), DateUtil.YYMMDD_HHmmSS));
+            this.setDisplayUpdateTime(DateUtil.format(pojo.getUpdateTime(), DateUtil.YYMMDD_HHmmSS));
+        }
+    }
+
+    public static List<${tableInfo.beanName}Vo> convertVo(List<${tableInfo.beanName}> ${tableInfo.shortBeanName}s) {
+        return CollectionUtils.isEmpty(${tableInfo.shortBeanName}s) ? null : ${tableInfo.shortBeanName}s.stream().map(${tableInfo.beanName}Vo::new).collect(Collectors.toList());
+    }
+}

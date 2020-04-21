@@ -1,0 +1,65 @@
+package ${servicePackage};
+
+import com.github.pagehelper.PageInfo;
+import ${commonPackage}.entity.Pager;
+import ${commonPackage}.service.BaseService;
+import ${beanPackage}.${tableInfo.beanName};
+import ${voPackage}.${tableInfo.beanName}Vo;
+
+/**
+ * ${tableInfo.beanName}Service  ${tableComment}
+ *
+ * @author ${authorName} (;￢＿￢) 
+ * @version ${version}
+ * @date $date
+ **/
+public interface ${tableInfo.beanName}Service extends BaseService<${tableInfo.beanName}> {
+
+    /**
+     * 根据主键查询（已判断 deleted 返回 null）
+     *
+     * @param id 主键
+     * @return ${tableInfo.beanName}
+     */
+    ${tableInfo.beanName} selectById(Long id);
+
+#foreach($method in ${methods})
+    #if(${method} == "list")
+    /**
+     * 分页查询
+     *
+     * @param ${tableInfo.shortBeanName}Vo 查询参数
+     * @param pager             分页参数
+     * @return PageInfo<${tableInfo.beanName}>
+     */
+    PageInfo<${tableInfo.beanName}Vo> list(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo, Pager pager);
+    #end
+    #if(${method} == "listInfo")
+
+    /**
+     * 详情查询
+     *
+     * @param id 主键
+     * @return ${tableInfo.beanName}Vo
+     */
+    ${tableInfo.beanName}Vo listInfo(Long id);
+    #end
+    #if(${method} == "save")
+
+    /**
+     * 保存
+     *
+     * @param ${tableInfo.shortBeanName}Vo 参数
+     */
+    void save(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo);
+    #end
+    #if(${method} == "deleted")
+    /**
+     * 删除操作
+     *
+     * @param id 主键
+     */
+    void deleted(Long id);
+    #end
+#end
+}

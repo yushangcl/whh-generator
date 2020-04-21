@@ -1,0 +1,47 @@
+package ${beanPackage};
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import ${commonPackage}.util.json.serializer.LongJsonDeserializer;
+import ${commonPackage}.util.json.serializer.LongJsonSerializer;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.Id;
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * ${tableInfo.beanName}
+ *
+ * @author ${authorName} (;￢＿￢) 
+ * @version ${version}
+ * @date $date
+ **/
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ${tableInfo.beanName} implements Serializable {
+#foreach($field in ${tableInfo.tableFields})
+
+    /**
+     * ${field.comment}
+     **/
+    #if(${field.filed} == "id")
+    @Id
+    #end
+    #if(${field.type} == "Long")
+    @JsonSerialize(using = LongJsonSerializer.class)
+    @JsonDeserialize(using = LongJsonDeserializer.class)
+    #end
+    #if(${field.type} == "Date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    #end
+    private ${field.type} ${field.property};
+#end
+
+}

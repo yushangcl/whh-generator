@@ -1,0 +1,16 @@
+package ${mapperPackage};
+
+import ${beanPackage}.${tableInfo.beanName};
+import tk.mybatis.mapper.common.Mapper;
+
+/**
+ * ${tableInfo.beanName}Mapper 数据库操作接口类
+ *
+ * @author ${authorName} (;￢＿￢) 
+ * @version ${version}
+ * @date $date
+ **/
+public interface ${tableInfo.beanName}Mapper extends Mapper<${tableInfo.beanName}> {
+
+
+}

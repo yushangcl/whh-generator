@@ -1,0 +1,21 @@
+package ${apiPackage};
+
+import ${commonPackage}.vo.BaseResultVo;
+import ${voPackage}.${tableInfo.beanName}Vo;
+import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+/**
+ * ${tableInfo.beanName}
+ *
+ * @author ${authorName}  (;￢＿￢) 
+ * @version ${version}
+ * @date $date
+ **/
+@FeignClient("scs-${model}")
+public interface ${tableInfo.beanName}Api {
+
+    @RequestMapping(value = "update", method = RequestMethod.GET)
+    BaseResultVo update(${tableInfo.beanName}Vo vo);
+}

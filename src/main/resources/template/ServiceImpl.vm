@@ -1,0 +1,243 @@
+package ${servicePackage}.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import ${base_package}.admin.api.SysUserApi;
+import ${base_package}.admin.base.vo.UserVo;
+import ${commonPackage}.entity.Pager;
+#if($lock)
+import ${commonPackage}.redisson.DistributedLocker;
+#end
+import ${commonPackage}.service.BaseServiceSupport;
+import ${commonPackage}.util.user.UserInfoUtil;
+import ${base_package}.${model}.base.criteria.${tableInfo.beanName}Criteria;
+#if($model == "sap")
+import com.runlion.scs.sap.base.enums.DeletedStatusEnum;
+import ${base_package}.${model}.base.exception.SapException;
+#elseif($model == "wms")
+import com.runlion.scs.wms.base.enums.common.DeletedEnum;
+import ${base_package}.${model}.base.exception.WmsException;
+#elseif($model == "contract")
+import com.runlion.scs.contract.base.enums.DeletedStatus;
+import ${base_package}.common.exception.BaseException;
+#else
+import ${base_package}.common.enums.YesOrNO
+import ${base_package}.common.exception.BaseException;
+#end
+import ${beanPackage}.${tableInfo.beanName};
+import ${voPackage}.${tableInfo.beanName}Vo;
+import ${mapperPackage}.${tableInfo.beanName}Mapper;
+import ${servicePackage}.${tableInfo.beanName}Service;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+#if($lock)
+import java.util.concurrent.TimeUnit;
+#end
+
+
+/**
+ * ${tableInfo.beanName}Service  ${tableComment}
+ *
+ * @author ${authorName} (;￢＿￢) 
+ * @version ${version}
+ * @date $date
+ **/
+@Slf4j
+@Service("${tableInfo.shortBeanName}Service")
+public class ${tableInfo.beanName}ServiceImpl extends BaseServiceSupport<${tableInfo.beanName}> implements ${tableInfo.beanName}Service {
+
+    @Resource
+    private ${tableInfo.beanName}Mapper ${tableInfo.shortBeanName}Mapper;
+
+    @Resource
+    private SysUserApi sysUserApi;
+
+    #if($lock)
+    @Resource
+    private DistributedLocker distributedLocker;
+    #end
+
+    /**
+     * 逻辑删除
+     *
+     * @param id 主键
+     * @return 0/1
+     */
+    private Integer logicalDeletedById(Long id, Long userId) {
+        ${tableInfo.beanName} ${tableInfo.shortBeanName} = new ${tableInfo.beanName}();
+        ${tableInfo.shortBeanName}.setId(id);
+        ${tableInfo.shortBeanName}.setUpdateUser(userId == null ? UserInfoUtil.getUserId() : userId);
+        #if($model == "sap")
+        ${tableInfo.shortBeanName}.setDeleted(DeletedStatusEnum.DELETED.getCode());
+        #elseif($model == "wms")
+        ${tableInfo.shortBeanName}.setDeleted(DeletedEnum.DELETED.getCode());
+        #elseif($model == "contract")
+        ${tableInfo.shortBeanName}.setDeleted(DeletedStatus.DELETED.getCode());
+        #else
+        ${tableInfo.shortBeanName}.setDeleted(YesOrNO.YES.getCode());
+        #end
+        return ${tableInfo.shortBeanName}Mapper.updateByPrimaryKeySelective(${tableInfo.shortBeanName});
+    }
+
+    @Override
+    public ${tableInfo.beanName} selectById(Long id) {
+        ${tableInfo.beanName} ${tableInfo.shortBeanName} = ${tableInfo.shortBeanName}Mapper.selectByPrimaryKey(id);
+        #if($model == "sap")
+        if (${tableInfo.shortBeanName} == null || DeletedStatusEnum.DELETED.getCode().equals(${tableInfo.shortBeanName}.getDeleted())) {
+        #elseif($model == "wms")
+        if (${tableInfo.shortBeanName} == null || DeletedEnum.DELETED.getCode().equals(${tableInfo.shortBeanName}.getDeleted())) {
+        #elseif($model == "contract")
+        if (${tableInfo.shortBeanName} == null || DeletedStatus.DELETED.getCode().equals(${tableInfo.shortBeanName}.getDeleted())) {
+        #else
+        if (${tableInfo.shortBeanName} == null || YesOrNO.DELETED.getCodeInteger().equals(${tableInfo.shortBeanName}.getDeleted())) {
+        #end
+            return null;
+        }
+        return ${tableInfo.shortBeanName};
+    }
+
+#foreach($method in ${methods})
+    #if(${method} == "list")
+    @Override
+    public PageInfo<${tableInfo.beanName}Vo> list(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo, Pager pager) {
+        ${tableInfo.beanName}Criteria example = new ${tableInfo.beanName}Criteria();
+        ${tableInfo.beanName}Criteria.Criteria criteria = example.createCriteria();
+        #if($model == "sap")
+        criteria.andDeletedEqualTo(DeletedStatusEnum.EXIT.getCode());
+        #elseif($model == "wms")
+        criteria.andDeletedEqualTo(DeletedEnum.NORMAL.getCode());
+        #elseif($model == "contract")
+        criteria.andDeletedEqualTo(DeletedStatus.NOT_DELETED.getCode());
+        #else
+        criteria.andDeletedEqualTo(YesOrNO.NO.getCodeInteger());
+        #end
+        // 时间
+        if (${tableInfo.shortBeanName}Vo.getStartTime() != null) {
+        criteria.andCreateTimeGreaterThan(${tableInfo.shortBeanName}Vo.getStartTime());
+        }
+        if (${tableInfo.shortBeanName}Vo.getEndTime() != null) {
+        criteria.andCreateTimeLessThan(${tableInfo.shortBeanName}Vo.getEndTime());
+        }
+        // 创建人
+        if (${tableInfo.shortBeanName}Vo.getCreateUser() != null) {
+        criteria.andCreateUserEqualTo(${tableInfo.shortBeanName}Vo.getCreateUser());
+        }
+        // 更新人
+        if (${tableInfo.shortBeanName}Vo.getCreateUser() != null) {
+        criteria.andCreateUserEqualTo(${tableInfo.shortBeanName}Vo.getCreateUser());
+        }
+        // todo
+        example.setOrderByClause("update_time desc");
+        if (pager != null) {
+            if (null != pager.getPageSize() && null != pager.getPageIndex()) {
+                PageHelper.startPage(pager.getPageIndex(), pager.getPageSize());
+            }
+        }
+        List<${tableInfo.beanName}> ${tableInfo.shortBeanName}s = ${tableInfo.shortBeanName}Mapper.selectByExample(example);
+        PageInfo<${tableInfo.beanName}> ${tableInfo.shortBeanName}PageInfo = new PageInfo<>(${tableInfo.shortBeanName}s);
+        if (${tableInfo.shortBeanName}PageInfo.getTotal() == 0) {
+            return new PageInfo<>();
+        }
+        PageInfo<${tableInfo.beanName}Vo> voPageInfo = new PageInfo<>();
+        BeanUtils.copyProperties(${tableInfo.shortBeanName}PageInfo, voPageInfo);
+        voPageInfo.setList(this.handle${tableInfo.beanName}Vos(${tableInfo.shortBeanName}PageInfo.getList()));
+        return voPageInfo;
+    }
+
+    private List<${tableInfo.beanName}Vo> handle${tableInfo.beanName}Vos(List<${tableInfo.beanName}> ${tableInfo.shortBeanName}s) {
+        List<Long> userIds = ${tableInfo.shortBeanName}s.stream().map(${tableInfo.beanName}::getCreateUser).distinct().collect(Collectors.toList());
+        userIds.addAll(${tableInfo.shortBeanName}s.stream().map(${tableInfo.beanName}::getUpdateUser).distinct().collect(Collectors.toList()));
+        Map<Long, UserVo> userVoMap = sysUserApi.getSysUserCacheMap(userIds);
+        List<${tableInfo.beanName}Vo> ${tableInfo.shortBeanName}Vos = new ArrayList<>();
+        for (${tableInfo.beanName} ${tableInfo.shortBeanName} : ${tableInfo.shortBeanName}s) {
+            ${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo = new ${tableInfo.beanName}Vo(${tableInfo.shortBeanName});
+            // 创建人
+            ${tableInfo.shortBeanName}Vo.setDisplayCreateUser(userVoMap.get(${tableInfo.shortBeanName}.getCreateUser()).getUserName());
+            ${tableInfo.shortBeanName}Vo.setDisplayUpdateUser(userVoMap.get(${tableInfo.shortBeanName}.getUpdateUser()).getUserName());
+            // todo
+            ${tableInfo.shortBeanName}Vos.add(${tableInfo.shortBeanName}Vo);
+        }
+        return ${tableInfo.shortBeanName}Vos;
+    }
+
+    #end
+    #if(${method} == "listInfo")
+    @Override
+    public ${tableInfo.beanName}Vo listInfo(Long id) {
+        ${tableInfo.beanName} ${tableInfo.shortBeanName} = this.selectById(id);
+        if (${tableInfo.shortBeanName} == null) {
+            throw new SapException("主键不存在！");
+        }
+        ${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo = new ${tableInfo.beanName}Vo(${tableInfo.shortBeanName});
+        Map<Long, UserVo> userVoMap = sysUserApi.getSysUserCacheMap(Arrays.asList((${tableInfo.shortBeanName}.getCreateUser(), (${tableInfo.shortBeanName}.getUpdateUser()));
+        ${tableInfo.shortBeanName}Vo.setDisplayCreateUser(userVoMap.get(${tableInfo.shortBeanName}.getCreateUser()).getUserName());
+        ${tableInfo.shortBeanName}Vo.setDisplayCreateUser(userVoMap.get(${tableInfo.shortBeanName}.getUpdateUser()).getUserName());
+        // todo
+        return ${tableInfo.shortBeanName}Vo;
+    }
+
+    #end
+    #if(${method} == "save")
+    #if($lock)
+    @LockManagerAnnotation()
+    #end
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void save(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo) {
+        if (${tableInfo.shortBeanName}Vo.getId() == null) {
+            this.add(${tableInfo.shortBeanName}Vo);
+            return;
+        }
+        #if($lock)
+        distributedLocker.tryLockAuto(null, ${tableInfo.shortBeanName}Vo.getId(), TimeUnit.SECONDS, 3, 120);
+        #end
+        this.edit(${tableInfo.shortBeanName}Vo);
+
+    }
+
+    private void add(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo) {
+        // todo
+
+        ${tableInfo.shortBeanName}Mapper.insertSelective(${tableInfo.shortBeanName}Vo);
+        if (log.isInfoEnabled()) {
+        log.info("【${tableComment}】《新增操作》，主键：{}，详情：{}", ${tableInfo.shortBeanName}Vo.getId(), JSONObject.toJSONString(${tableInfo.shortBeanName}Vo));
+        }
+    }
+
+    private void edit(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo) {
+        ${tableInfo.beanName} ${tableInfo.shortBeanName} = this.selectById(${tableInfo.shortBeanName}Vo.getId());
+        if (${tableInfo.shortBeanName} == null) {
+            throw new SapException("主键不存在！");
+        }
+        // todo
+
+    }
+
+    #end
+    #if(${method} == "deleted")
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void deleted(Long id) {
+        // 判断状态是否能删除
+        ${tableInfo.beanName} ${tableInfo.shortBeanName} = this.selectById(id);
+        if (${tableInfo.shortBeanName} == null) {
+            throw new SapException("主键不存在！");
+        }
+        // todo
+
+        Integer num = this.logicalDeletedById(id, UserInfoUtil.getUserId());
+        if (log.isInfoEnabled()) {
+        log.info("【${tableComment}】《删除操作》，主键：{}，数量：{}，操作人：{}", id, num, UserInfoUtil.getUserId());
+        }
+    }
+    #end
+#end
+}

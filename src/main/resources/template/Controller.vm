@@ -1,0 +1,114 @@
+package ${controllerPackage};
+
+import com.github.pagehelper.PageInfo;
+import ${base_package}.basics.annotation.SysLog;
+import ${commonPackage}.entity.Pager;
+#foreach($method in ${tableInfo.methods})
+    #if(${method} == "export")
+import ${commonPackage}.constants.CommonConstant;
+import ${commonPackage}.entity.ExcelParamDto;
+import ${commonPackage}.util.ExcelCommonUtils;
+    #end
+#end
+import ${commonPackage}.vo.BaseResultVo;
+import ${voPackage}.${tableInfo.beanName}Vo;
+import ${servicePackage}.${tableInfo.beanName}Service;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * ${tableInfo.tableComment}
+ *
+ * @author ${authorName}  (;￢＿￢) 
+ * @version ${version}
+ * @date $date
+ **/
+@RestController
+@RequestMapping("/${tableInfo.shortBeanName}")
+public class ${tableInfo.beanName}Controller {
+
+    @Resource
+    private ${tableInfo.beanName}Service ${tableInfo.shortBeanName}Service;
+
+#foreach($method in ${methods})
+    #if(${method} == "list")
+    /**
+     * ${tableInfo.tableComment}-分页查询
+     *
+     * @param ${tableInfo.shortBeanName}Vo 查询参数
+     * @param pager             分页参数
+     * @return PageInfo<${tableInfo.beanName}Vo>
+     */
+    @GetMapping("/list")
+    public BaseResultVo list(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo, Pager pager) {
+        return BaseResultVo.success(${tableInfo.shortBeanName}Service.list(${tableInfo.shortBeanName}Vo, pager));
+    }
+
+    #end
+    #if(${method} == "listInfo")
+    /**
+     * ${tableInfo.tableComment}-详情查询
+     *
+     * @param id 主键
+     * @return ${tableInfo.beanName}Vo
+     */
+    @GetMapping("/listInfo")
+    public BaseResultVo listInfo(Long id) {
+        return BaseResultVo.success(${tableInfo.shortBeanName}Service.listInfo(id));
+    }
+
+    #end
+    #if(${method} == "export")
+    /**
+     * ${tableInfo.tableComment}-导出
+     *
+     * @param ${tableInfo.shortBeanName}Vo 查询参数
+     * @param pager             分页参数
+     * @param response          请求
+     */
+    @GetMapping("/export")
+    public void export(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo, Pager pager, HttpServletResponse response) {
+        //查询数据
+        PageInfo<${tableInfo.beanName}Vo> pageInfo = ${tableInfo.shortBeanName}Service.list(${tableInfo.shortBeanName}Vo, pager);
+        ExcelCommonUtils.exportCommonNew("${tableInfo.tableComment}", "序号", pageInfo.getList(), ${tableInfo.beanName}Vo.class, response, ExcelParamDto.builder().headerType(CommonConstant.ONE_INTEGER).build());
+
+    }
+
+    #end
+    #if(${method} == "save")
+    /**
+     * ${tableInfo.tableComment}-保存
+     *
+     * @param ${tableInfo.shortBeanName}Vo 参数
+     */
+    @SysLog(descrption = "${tableInfo.tableComment}-新增")
+    @PostMapping("/save")
+    public BaseResultVo save${tableInfo.beanName}(@RequestBody ${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo) {
+        if (${tableInfo.shortBeanName}Vo == null) {
+            return BaseResultVo.error("参数为空！");
+        }
+        ${tableInfo.shortBeanName}Service.save(${tableInfo.shortBeanName}Vo);
+        return BaseResultVo.success();
+    }
+
+    #end
+    #if(${method} == "deleted")
+    /**
+    * ${tableInfo.tableComment}-删除
+    *
+    * @param id 主键
+    */
+    @SysLog(descrption = "${tableInfo.tableComment}-删除")
+    @PostMapping("/deleted")
+    public BaseResultVo deleted(Long id) {
+        if (id == null) {
+            return BaseResultVo.error("参数为空");
+        }
+        ${tableInfo.shortBeanName}Service.deleted(id);
+        return BaseResultVo.success();
+    }
+    #end
+#end
+}
