@@ -6,7 +6,8 @@ import ${base_package}.admin.api.SysUserApi;
 import ${base_package}.admin.base.vo.UserVo;
 import ${commonPackage}.entity.Pager;
 #if($lock)
-import ${commonPackage}.redisson.DistributedLocker;
+import ${commonPackage}.redisson.lock.LockManagerAnnotation;
+import ${commonPackage}.redisson.lock.LockManagerUtil;
 #end
 import ${commonPackage}.service.BaseServiceSupport;
 import ${commonPackage}.util.user.UserInfoUtil;
@@ -19,7 +20,7 @@ import com.runlion.scs.wms.base.enums.common.DeletedEnum;
 import ${base_package}.${model}.base.exception.WmsException;
 #elseif($model == "contract")
 import com.runlion.scs.contract.base.enums.DeletedStatus;
-import ${base_package}.common.exception.BaseException;
+import ${commonPackage}.exception.BaseException;
 #else
 import ${base_package}.common.enums.YesOrNO
 import ${base_package}.common.exception.BaseException;
@@ -44,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * ${tableInfo.beanName}Service  ${tableComment}
+ * ${tableInfo.beanName}Service  ${tableInfo.tableComment}
  *
  * @author ${authorName} (;￢＿￢) 
  * @version ${version}
@@ -59,11 +60,6 @@ public class ${tableInfo.beanName}ServiceImpl extends BaseServiceSupport<${table
 
     @Resource
     private SysUserApi sysUserApi;
-
-    #if($lock)
-    @Resource
-    private DistributedLocker distributedLocker;
-    #end
 
     /**
      * 逻辑删除
@@ -174,10 +170,10 @@ public class ${tableInfo.beanName}ServiceImpl extends BaseServiceSupport<${table
     public ${tableInfo.beanName}Vo listInfo(Long id) {
         ${tableInfo.beanName} ${tableInfo.shortBeanName} = this.selectById(id);
         if (${tableInfo.shortBeanName} == null) {
-            throw new SapException("主键不存在！");
+            throw new BaseException("主键不存在！");
         }
         ${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo = new ${tableInfo.beanName}Vo(${tableInfo.shortBeanName});
-        Map<Long, UserVo> userVoMap = sysUserApi.getSysUserCacheMap(Arrays.asList((${tableInfo.shortBeanName}.getCreateUser(), (${tableInfo.shortBeanName}.getUpdateUser()));
+        Map<Long, UserVo> userVoMap = sysUserApi.getSysUserCacheMap(Arrays.asList(${tableInfo.shortBeanName}.getCreateUser(), ${tableInfo.shortBeanName}.getUpdateUser()));
         ${tableInfo.shortBeanName}Vo.setDisplayCreateUser(userVoMap.get(${tableInfo.shortBeanName}.getCreateUser()).getUserName());
         ${tableInfo.shortBeanName}Vo.setDisplayCreateUser(userVoMap.get(${tableInfo.shortBeanName}.getUpdateUser()).getUserName());
         // todo
@@ -197,7 +193,7 @@ public class ${tableInfo.beanName}ServiceImpl extends BaseServiceSupport<${table
             return;
         }
         #if($lock)
-        distributedLocker.tryLockAuto(null, ${tableInfo.shortBeanName}Vo.getId(), TimeUnit.SECONDS, 3, 120);
+        LockManagerUtil.tryLockAuto(null, ${tableInfo.shortBeanName}Vo.getId(), TimeUnit.SECONDS, 3, 120);
         #end
         this.edit(${tableInfo.shortBeanName}Vo);
 
@@ -208,14 +204,14 @@ public class ${tableInfo.beanName}ServiceImpl extends BaseServiceSupport<${table
 
         ${tableInfo.shortBeanName}Mapper.insertSelective(${tableInfo.shortBeanName}Vo);
         if (log.isInfoEnabled()) {
-        log.info("【${tableComment}】《新增操作》，主键：{}，详情：{}", ${tableInfo.shortBeanName}Vo.getId(), JSONObject.toJSONString(${tableInfo.shortBeanName}Vo));
+        log.info("【${tableInfo.tableComment}】《新增操作》，主键：{}，详情：{}", ${tableInfo.shortBeanName}Vo.getId(), JSONObject.toJSONString(${tableInfo.shortBeanName}Vo));
         }
     }
 
     private void edit(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo) {
         ${tableInfo.beanName} ${tableInfo.shortBeanName} = this.selectById(${tableInfo.shortBeanName}Vo.getId());
         if (${tableInfo.shortBeanName} == null) {
-            throw new SapException("主键不存在！");
+            throw new BaseException("主键不存在！");
         }
         // todo
 
@@ -229,13 +225,13 @@ public class ${tableInfo.beanName}ServiceImpl extends BaseServiceSupport<${table
         // 判断状态是否能删除
         ${tableInfo.beanName} ${tableInfo.shortBeanName} = this.selectById(id);
         if (${tableInfo.shortBeanName} == null) {
-            throw new SapException("主键不存在！");
+            throw new BaseException("主键不存在！");
         }
         // todo
 
         Integer num = this.logicalDeletedById(id, UserInfoUtil.getUserId());
         if (log.isInfoEnabled()) {
-        log.info("【${tableComment}】《删除操作》，主键：{}，数量：{}，操作人：{}", id, num, UserInfoUtil.getUserId());
+        log.info("【${tableInfo.tableComment}】《删除操作》，主键：{}，数量：{}，操作人：{}", id, num, UserInfoUtil.getUserId());
         }
     }
     #end

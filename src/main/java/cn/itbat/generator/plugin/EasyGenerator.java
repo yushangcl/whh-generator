@@ -252,7 +252,7 @@ public class EasyGenerator {
      */
     private void buildApi() {
         context.put("tableInfo", tableInfo);
-        VelocityUtil.generate("template/api.vm", apiPath + "\\api\\" + this.shotFirst(tableInfo.getBeanName()) + "Api.java", context);
+        VelocityUtil.generate("template/api.vm", apiPath + "\\api\\" + tableInfo.getBeanName() + "Api.java", context);
     }
 
     /**
@@ -426,7 +426,7 @@ public class EasyGenerator {
                         //update
                         buildCriteria();
                         buildEntityBean();
-                        buildMapper();
+//                        buildMapper();
                         buildMapperXml();
                         break;
                     default:

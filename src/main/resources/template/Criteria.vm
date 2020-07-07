@@ -136,6 +136,7 @@ public class ${tableInfo.beanName}Criteria {
         }
 
     #foreach($field in ${tableInfo.tableFields})
+
         public Criteria and${field.upFiled}IsNull() {
             addCriterion("${field.filed} is null");
             return (Criteria) this;
