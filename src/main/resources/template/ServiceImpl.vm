@@ -1,29 +1,12 @@
 package ${servicePackage}.impl;
 
+#if($methods && $methods.size() > 0)
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import ${base_package}.admin.api.SysUserApi;
-import ${base_package}.admin.base.vo.UserVo;
-import ${commonPackage}.entity.Pager;
-import ${base_package}.common.enums.DeletedEnum;
-import ${base_package}.common.exception.BaseException;
-#if($lock)
-import ${commonPackage}.redisson.lock.LockManagerAnnotation;
-import ${commonPackage}.redisson.lock.LockManagerUtil;
-#end
-import ${commonPackage}.util.user.UserInfoUtil;
-import ${base_package}.${model}.base.criteria.${tableInfo.beanName}Criteria;
-import ${beanPackage}.${tableInfo.beanName};
-import ${voPackage}.${tableInfo.beanName}Vo;
-import ${mapperPackage}.${tableInfo.beanName}Mapper;
-import ${servicePackage}.${tableInfo.beanName}Service;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
+import com.dangdang.ddframe.rdb.sharding.id.generator.IdGenerator;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
+import org.springframework.beans.BeanUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +15,41 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 #end
 import java.util.stream.Collectors;
+import ${base_package}.common.exception.BaseException;
+#if($lock)
+import ${commonPackage}.redisson.lock.LockManagerAnnotation;
+import ${commonPackage}.redisson.lock.LockManagerUtil;
+#end
+import ${base_package}.admin.api.SysUserApi;
+import ${base_package}.admin.base.vo.UserVo;
+import ${commonPackage}.entity.Pager;
+import ${commonPackage}.util.user.UserInfoUtil;
+import ${base_package}.${model}.base.criteria.${tableInfo.beanName}Criteria;
+#foreach($field in ${tableInfo.tableFields})
+    #if(${field.filed} == "skuId")
+import ${base_package}.sku.api.ProductApi;
+import ${base_package}.sku.base.vo.SimpleProductVo;
+    #end
+    #if(${field.filed} == "warehouseId")
+import ${base_package}.bdm.api.StoreHouseApi;
+import ${base_package}.bdm.base.vo.StoreHouseVo;
+    #end
+    #if(${field.filed} == "customerId")
+import ${base_package}.bdm.api.CustomerApi;
+import ${base_package}.bdm.base.vo.CustomerVo;
+    #end
+#end
+#end
+import ${base_package}.common.enums.DeletedEnum;
+import ${beanPackage}.${tableInfo.beanName};
+import ${voPackage}.${tableInfo.beanName}Vo;
+import ${mapperPackage}.${tableInfo.beanName}Mapper;
+import ${servicePackage}.${tableInfo.beanName}Service;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+
 
 /**
  * ${tableInfo.beanName}Service  ${tableInfo.tableComment}
@@ -46,9 +64,31 @@ public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Se
 
     @Resource
     private ${tableInfo.beanName}Mapper ${tableInfo.shortBeanName}Mapper;
-
+#if($methods && $methods.size() > 0)
     @Resource
     private SysUserApi sysUserApi;
+
+    @Resource
+    private IdGenerator idGenerator;
+
+#foreach($field in ${tableInfo.tableFields})
+    #if(${field.filed} == "skuId")
+
+    @Resource
+    private ProductApi productApi;
+    #end
+    #if(${field.filed} == "warehouseId")
+
+    @Resource
+    private StoreHouseApi storeHouseApi;
+    #end
+    #if(${field.filed} == "customerId")
+
+    @Resource
+    private CustomerApi customerApi;
+    #end
+#end
+#end
 
     /**
      * 逻辑删除
@@ -95,6 +135,29 @@ public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Se
         if (${tableInfo.shortBeanName}Vo.getCreateUser() != null) {
         criteria.andCreateUserEqualTo(${tableInfo.shortBeanName}Vo.getCreateUser());
         }
+    #foreach($field in ${tableInfo.tableFields})
+        #if(${field.filed} == "status")
+        if (${tableInfo.shortBeanName}Vo.getCreateUser() != null) {
+            criteria.andStatusEqualTo(${tableInfo.shortBeanName}Vo.getStatus());
+        }
+        #end
+        #if(${field.filed} == "type")
+        if (${tableInfo.shortBeanName}Vo.getType() != null) {
+            criteria.andTypeEqualTo(${tableInfo.shortBeanName}Vo.getType());
+        }
+        #end
+        #if(${field.filed} == "warehouseId")
+        if (${tableInfo.shortBeanName}Vo.getWarehouseId() != null) {
+            criteria.andWarehouseIdEqualTo(${tableInfo.shortBeanName}Vo.getWarehouseId());
+        }
+        #end
+        #if(${field.filed} == "customerId")
+        if (${tableInfo.shortBeanName}Vo.getWarehouseId() != null) {
+            criteria.andCustomerIdEqualTo(${tableInfo.shortBeanName}Vo.getCustomerId());
+        }
+        #end
+    #end
+
         // todo
         example.setOrderByClause("update_time desc");
         if (pager != null) {
@@ -117,12 +180,52 @@ public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Se
         List<Long> userIds = ${tableInfo.shortBeanName}s.stream().map(${tableInfo.beanName}::getCreateUser).distinct().collect(Collectors.toList());
         userIds.addAll(${tableInfo.shortBeanName}s.stream().map(${tableInfo.beanName}::getUpdateUser).distinct().collect(Collectors.toList()));
         Map<Long, UserVo> userVoMap = sysUserApi.getSysUserCacheMap(userIds);
+#foreach($field in ${tableInfo.tableFields})
+    #if(${field.filed} == "skuId")
+        // sku信息
+        List<Long> skuIds = ${tableInfo.shortBeanName}s.stream().map(${tableInfo.beanName}::getSkuId).distinct().collect(Collectors.toList());
+        Map<Long, SimpleProductVo>  simpleProductVoMap = productApi.getSimpleProductMapBySkuIds(skuIds);
+    #end
+    #if(${field.filed} == "warehouseId")
+        List<Long> warehouseIds = ${tableInfo.shortBeanName}s.stream().map(${tableInfo.beanName}::getWarehouseId).distinct().collect(Collectors.toList());
+        Map<Long, StoreHouseVo> storeHouseCacheMap = storeHouseApi.getStoreHouseCacheMap(warehouseIds);
+    #end
+    #if(${field.filed} == "customerId")
+        List<Long> customerIds = ${tableInfo.shortBeanName}s.stream().map(${tableInfo.beanName}::getCustomerId).distinct().collect(Collectors.toList());
+        Map<Long, CustomerVo> customerMap = customerApi.getCustomerCacheMap(customerIds);
+    #end
+#end
         List<${tableInfo.beanName}Vo> ${tableInfo.shortBeanName}Vos = new ArrayList<>();
         for (${tableInfo.beanName} ${tableInfo.shortBeanName} : ${tableInfo.shortBeanName}s) {
             ${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo = new ${tableInfo.beanName}Vo(${tableInfo.shortBeanName});
             // 创建人
             ${tableInfo.shortBeanName}Vo.setDisplayCreateUser(userVoMap.get(${tableInfo.shortBeanName}.getCreateUser()).getUserName());
             ${tableInfo.shortBeanName}Vo.setDisplayUpdateUser(userVoMap.get(${tableInfo.shortBeanName}.getUpdateUser()).getUserName());
+   #foreach($field in ${tableInfo.tableFields})
+       #if(${field.filed} == "skuId")
+            // sku信息
+           SimpleProductVo simpleProductVo = simpleProductVoMap.get(${tableInfo.shortBeanName}.getSkuId());
+           if(simpleProductVo != null){
+               ${tableInfo.shortBeanName}Vo.setSkuCode(simpleProductVo.getCode());
+               ${tableInfo.shortBeanName}Vo.setSkuName(simpleProductVo.getName());
+               ${tableInfo.shortBeanName}Vo.setUnitName(simpleProductVo.getMainUnitName());
+           }
+       #end
+       #if(${field.filed} == "warehouseId")
+           // 仓库信息
+           StoreHouseVo storeHouseVo = storeHouseCacheMap.get(${tableInfo.shortBeanName}.getWarehouseId());
+           if(storeHouseVo != null){
+           ${tableInfo.shortBeanName}Vo.setWarehouseName(storeHouseVo.getStoreHouseName());
+           }
+       #end
+       #if(${field.filed} == "customerId")
+           // 客户信息
+           CustomerVo customerVo = customerMap.get(${tableInfo.shortBeanName}.getCustomerId());
+           if(customerVo != null){
+           ${tableInfo.shortBeanName}Vo.setCustomerName(customerVo.getEcterpriseName());
+           }
+       #end
+   #end
             // todo
             ${tableInfo.shortBeanName}Vos.add(${tableInfo.shortBeanName}Vo);
         }
@@ -139,8 +242,46 @@ public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Se
         }
         ${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo = new ${tableInfo.beanName}Vo(${tableInfo.shortBeanName});
         Map<Long, UserVo> userVoMap = sysUserApi.getSysUserCacheMap(Arrays.asList(${tableInfo.shortBeanName}.getCreateUser(), ${tableInfo.shortBeanName}.getUpdateUser()));
+#foreach($field in ${tableInfo.tableFields})
+    #if(${field.filed} == "skuId")
+        // sku信息
+        Map<Long, SimpleProductVo>  simpleProductVoMap = productApi.getSimpleProductMapBySkuIds(Collections.singletonList(${tableInfo.shortBeanName}.getSkuId()));
+    #end
+    #if(${field.filed} == "warehouseId")
+        Map<Long, StoreHouseVo> storeHouseCacheMap = storeHouseApi.getStoreHouseCacheMap(Collections.singletonList(${tableInfo.shortBeanName}.getWarehouseId()));
+    #end
+    #if(${field.filed} == "customerId")
+        Map<Long, CustomerVo> customerMap = customerApi.getCustomerCacheMap(Collections.singletonList(${tableInfo.shortBeanName}.getCustomerId()));
+    #end
+#end
+
         ${tableInfo.shortBeanName}Vo.setDisplayCreateUser(userVoMap.get(${tableInfo.shortBeanName}.getCreateUser()).getUserName());
         ${tableInfo.shortBeanName}Vo.setDisplayCreateUser(userVoMap.get(${tableInfo.shortBeanName}.getUpdateUser()).getUserName());
+#foreach($field in ${tableInfo.tableFields})
+    #if(${field.filed} == "skuId")
+        // sku信息
+        SimpleProductVo simpleProductVo = simpleProductVoMap.get(${tableInfo.shortBeanName}.getSkuId());
+        if(simpleProductVo != null){
+        ${tableInfo.shortBeanName}Vo.setSkuCode(simpleProductVo.getCode());
+        ${tableInfo.shortBeanName}Vo.setSkuName(simpleProductVo.getName());
+        ${tableInfo.shortBeanName}Vo.setUnitName(simpleProductVo.getMainUnitName());
+        }
+    #end
+    #if(${field.filed} == "warehouseId")
+        // 仓库信息
+        StoreHouseVo storeHouseVo = storeHouseCacheMap.get(${tableInfo.shortBeanName}.getWarehouseId());
+        if(storeHouseVo != null){
+        ${tableInfo.shortBeanName}Vo.setWarehouseName(storeHouseVo.getStoreHouseName());
+        }
+    #end
+    #if(${field.filed} == "customerId")
+        // 客户信息
+        CustomerVo customerVo = customerMap.get(${tableInfo.shortBeanName}.getCustomerId());
+        if(customerVo != null){
+        ${tableInfo.shortBeanName}Vo.setCustomerName(customerVo.getEcterpriseName());
+        }
+    #end
+#end
         // todo
         return ${tableInfo.shortBeanName}Vo;
     }

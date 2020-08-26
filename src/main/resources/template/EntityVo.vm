@@ -41,23 +41,23 @@ public class ${tableInfo.beanName}Vo extends ${tableInfo.beanName} {
      * 显示更新人
      **/
     private String displayUpdateUser;
-
 #foreach($field in ${tableInfo.tableFields})
     #if(${field.filed} == "status")
+
     /**
     * 显示状态
     **/
     private String displayStatus;
     #end
-
     #if(${field.filed} == "type")
+
     /**
     * 显示类型
     **/
     private String displayType;
     #end
-
     #if(${field.filed} == "skuId")
+
     /**
     * sku编码
     **/
@@ -73,15 +73,15 @@ public class ${tableInfo.beanName}Vo extends ${tableInfo.beanName} {
     **/
     private String unitName;
     #end
-
     #if(${field.filed} == "warehouseId")
+
     /**
     * 客户名称
     **/
     private String warehouseName;
     #end
-
     #if(${field.filed} == "customerId")
+
     /**
     * 客户名称
     **/

@@ -76,7 +76,7 @@ public class EasyGenerator {
         String driverName = generatorProps.getProperty("driverName");
         String user = generatorProps.getProperty("user");
         String password = generatorProps.getProperty("password");
-        String url = generatorProps.getProperty("url");
+        String url = generatorProps.getProperty("url").replace("{model}", model);
         tbName = generatorProps.getProperty("table_name");
         Class.forName(driverName);
         conn = DriverManager.getConnection(url, user, password);
@@ -319,6 +319,9 @@ public class EasyGenerator {
                             .upFiled(processFieldUp(results.getString("FIELD")))
                             .type(processType(results.getString("TYPE")))
                             .comment(results.getString("COMMENT")).build());
+                    if (results.getString("FIELD").equals("status")) {
+                        context.put("status", true);
+                    }
                 }
             } catch (Exception e) {
                 System.out.println("=============error: " + e + "==================");
@@ -392,7 +395,7 @@ public class EasyGenerator {
                         buildService();
                         buildServiceImpl();
                         buildController();
-                        buildApi();
+//                        buildApi();
                         break;
                     case 1:
                         //criteria
