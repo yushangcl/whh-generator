@@ -70,7 +70,6 @@ public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Se
 
     @Resource
     private IdGenerator idGenerator;
-
 #foreach($field in ${tableInfo.tableFields})
     #if(${field.filed} == "skuId")
 

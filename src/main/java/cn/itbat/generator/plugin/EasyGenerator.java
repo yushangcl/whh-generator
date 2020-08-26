@@ -289,6 +289,9 @@ public class EasyGenerator {
                 String tableName = results.getString("NAME");
                 String comment = results.getString("COMMENT");
                 maps.put(tableName, comment);
+                if (tableName.contains("detail")) {
+                    context.put("methods", null);
+                }
             }
         } catch (Exception e) {
             System.out.println("=============erro: " + e + "=======================");
@@ -319,9 +322,6 @@ public class EasyGenerator {
                             .upFiled(processFieldUp(results.getString("FIELD")))
                             .type(processType(results.getString("TYPE")))
                             .comment(results.getString("COMMENT")).build());
-                    if (results.getString("FIELD").equals("status")) {
-                        context.put("status", true);
-                    }
                 }
             } catch (Exception e) {
                 System.out.println("=============error: " + e + "==================");
