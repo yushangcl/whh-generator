@@ -1,30 +1,19 @@
 package ${servicePackage}.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import ${base_package}.admin.api.SysUserApi;
 import ${base_package}.admin.base.vo.UserVo;
 import ${commonPackage}.entity.Pager;
+import ${base_package}.common.enums.DeletedEnum;
+import ${base_package}.common.exception.BaseException;
 #if($lock)
 import ${commonPackage}.redisson.lock.LockManagerAnnotation;
 import ${commonPackage}.redisson.lock.LockManagerUtil;
 #end
-import ${commonPackage}.service.BaseServiceSupport;
 import ${commonPackage}.util.user.UserInfoUtil;
 import ${base_package}.${model}.base.criteria.${tableInfo.beanName}Criteria;
-#if($model == "sap")
-import com.runlion.scs.sap.base.enums.DeletedStatusEnum;
-import ${base_package}.${model}.base.exception.SapException;
-#elseif($model == "wms")
-import com.runlion.scs.wms.base.enums.common.DeletedEnum;
-import ${base_package}.${model}.base.exception.WmsException;
-#elseif($model == "contract")
-import com.runlion.scs.contract.base.enums.DeletedStatus;
-import ${commonPackage}.exception.BaseException;
-#else
-import ${base_package}.common.enums.YesOrNO
-import ${base_package}.common.exception.BaseException;
-#end
 import ${beanPackage}.${tableInfo.beanName};
 import ${voPackage}.${tableInfo.beanName}Vo;
 import ${mapperPackage}.${tableInfo.beanName}Mapper;
@@ -36,13 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 #if($lock)
 import java.util.concurrent.TimeUnit;
 #end
-
+import java.util.stream.Collectors;
 
 /**
  * ${tableInfo.beanName}Service  ${tableInfo.tableComment}
@@ -53,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  **/
 @Slf4j
 @Service("${tableInfo.shortBeanName}Service")
-public class ${tableInfo.beanName}ServiceImpl extends BaseServiceSupport<${tableInfo.beanName}> implements ${tableInfo.beanName}Service {
+public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Service {
 
     @Resource
     private ${tableInfo.beanName}Mapper ${tableInfo.shortBeanName}Mapper;
@@ -71,30 +60,14 @@ public class ${tableInfo.beanName}ServiceImpl extends BaseServiceSupport<${table
         ${tableInfo.beanName} ${tableInfo.shortBeanName} = new ${tableInfo.beanName}();
         ${tableInfo.shortBeanName}.setId(id);
         ${tableInfo.shortBeanName}.setUpdateUser(userId == null ? UserInfoUtil.getUserId() : userId);
-        #if($model == "sap")
-        ${tableInfo.shortBeanName}.setDeleted(DeletedStatusEnum.DELETED.getCode());
-        #elseif($model == "wms")
         ${tableInfo.shortBeanName}.setDeleted(DeletedEnum.DELETED.getCode());
-        #elseif($model == "contract")
-        ${tableInfo.shortBeanName}.setDeleted(DeletedStatus.DELETED.getCode());
-        #else
-        ${tableInfo.shortBeanName}.setDeleted(YesOrNO.YES.getCode());
-        #end
         return ${tableInfo.shortBeanName}Mapper.updateByPrimaryKeySelective(${tableInfo.shortBeanName});
     }
 
     @Override
     public ${tableInfo.beanName} selectById(Long id) {
         ${tableInfo.beanName} ${tableInfo.shortBeanName} = ${tableInfo.shortBeanName}Mapper.selectByPrimaryKey(id);
-        #if($model == "sap")
-        if (${tableInfo.shortBeanName} == null || DeletedStatusEnum.DELETED.getCode().equals(${tableInfo.shortBeanName}.getDeleted())) {
-        #elseif($model == "wms")
         if (${tableInfo.shortBeanName} == null || DeletedEnum.DELETED.getCode().equals(${tableInfo.shortBeanName}.getDeleted())) {
-        #elseif($model == "contract")
-        if (${tableInfo.shortBeanName} == null || DeletedStatus.DELETED.getCode().equals(${tableInfo.shortBeanName}.getDeleted())) {
-        #else
-        if (${tableInfo.shortBeanName} == null || YesOrNO.DELETED.getCodeInteger().equals(${tableInfo.shortBeanName}.getDeleted())) {
-        #end
             return null;
         }
         return ${tableInfo.shortBeanName};
@@ -106,15 +79,7 @@ public class ${tableInfo.beanName}ServiceImpl extends BaseServiceSupport<${table
     public PageInfo<${tableInfo.beanName}Vo> list(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo, Pager pager) {
         ${tableInfo.beanName}Criteria example = new ${tableInfo.beanName}Criteria();
         ${tableInfo.beanName}Criteria.Criteria criteria = example.createCriteria();
-        #if($model == "sap")
-        criteria.andDeletedEqualTo(DeletedStatusEnum.EXIT.getCode());
-        #elseif($model == "wms")
         criteria.andDeletedEqualTo(DeletedEnum.NORMAL.getCode());
-        #elseif($model == "contract")
-        criteria.andDeletedEqualTo(DeletedStatus.NOT_DELETED.getCode());
-        #else
-        criteria.andDeletedEqualTo(YesOrNO.NO.getCodeInteger());
-        #end
         // 时间
         if (${tableInfo.shortBeanName}Vo.getStartTime() != null) {
         criteria.andCreateTimeGreaterThan(${tableInfo.shortBeanName}Vo.getStartTime());
@@ -165,9 +130,9 @@ public class ${tableInfo.beanName}ServiceImpl extends BaseServiceSupport<${table
     }
 
     #end
-    #if(${method} == "listInfo")
+    #if(${method} == "getInfo")
     @Override
-    public ${tableInfo.beanName}Vo listInfo(Long id) {
+    public ${tableInfo.beanName}Vo getInfo(Long id) {
         ${tableInfo.beanName} ${tableInfo.shortBeanName} = this.selectById(id);
         if (${tableInfo.shortBeanName} == null) {
             throw new BaseException("主键不存在！");

@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class ServiceMethod {
 
     private String list;
-    private String listInfo;
+    private String getInfo;
     private String export;
     private String save;
     private String deleted;

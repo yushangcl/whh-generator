@@ -20,7 +20,7 @@ public enum ServiceMethodEnum {
     /**
      * 详情查询
      */
-    LIST_INFO("listInfo", "详情查询"),
+    GET_INFO("getInfo", "详情查询"),
 
     /**
      * 导出

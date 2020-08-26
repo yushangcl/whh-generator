@@ -42,6 +42,13 @@ public class ${tableInfo.beanName}Vo extends ${tableInfo.beanName} {
      **/
     private String displayUpdateUser;
 
+#if($status)
+    /**
+    * 显示状态
+    **/
+    private String displayStatus;
+#end
+
     /**
      * 开始时间
      */

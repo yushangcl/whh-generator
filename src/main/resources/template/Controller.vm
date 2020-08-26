@@ -8,6 +8,7 @@ import ${commonPackage}.entity.Pager;
 import ${commonPackage}.constants.CommonConstant;
 import ${commonPackage}.entity.ExcelParamDto;
 import ${commonPackage}.util.ExcelCommonUtils;
+import ${commonPackage}.common.util.ExcelCommonUtils;
     #end
 #end
 import ${commonPackage}.vo.BaseResultVo;
@@ -41,22 +42,22 @@ public class ${tableInfo.beanName}Controller {
      * @param pager             分页参数
      * @return PageInfo<${tableInfo.beanName}Vo>
      */
-    @GetMapping("/list")
+    @PostMapping("/list")
     public BaseResultVo list(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo, Pager pager) {
         return BaseResultVo.success(${tableInfo.shortBeanName}Service.list(${tableInfo.shortBeanName}Vo, pager));
     }
 
     #end
-    #if(${method} == "listInfo")
+    #if(${method} == "getInfo")
     /**
      * ${tableInfo.tableComment}-详情查询
      *
      * @param id 主键
      * @return ${tableInfo.beanName}Vo
      */
-    @GetMapping("/listInfo")
-    public BaseResultVo listInfo(Long id) {
-        return BaseResultVo.success(${tableInfo.shortBeanName}Service.listInfo(id));
+    @GetMapping("/getInfo")
+    public BaseResultVo getInfo(Long id) {
+        return BaseResultVo.success(${tableInfo.shortBeanName}Service.getInfo(id));
     }
 
     #end
@@ -68,7 +69,7 @@ public class ${tableInfo.beanName}Controller {
      * @param pager             分页参数
      * @param response          请求
      */
-    @GetMapping("/export")
+    @PostMapping("/export")
     public void export(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo, Pager pager, HttpServletResponse response) {
         //查询数据
         PageInfo<${tableInfo.beanName}Vo> pageInfo = ${tableInfo.shortBeanName}Service.list(${tableInfo.shortBeanName}Vo, pager);

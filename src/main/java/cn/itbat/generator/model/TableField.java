@@ -28,6 +28,7 @@ public class TableField {
      * 字段类型
      */
     private String type;
+
     /**
      * 注释
      */
