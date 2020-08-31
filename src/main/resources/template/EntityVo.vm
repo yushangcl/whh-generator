@@ -25,36 +25,36 @@ public class ${tableInfo.beanName}Vo extends ${tableInfo.beanName} {
     /**
      * 显示创建时间
      **/
-    private String displayCreateTime;
+    private String createTimeDesc;
 
     /**
      * 显示更新时间
      **/
-    private String displayUpdateTime;
+    private String updateTimeDesc;
 
     /**
      * 显示创建人
      **/
-    private String displayCreateUser;
+    private String createUserDesc;
 
     /**
      * 显示更新人
      **/
-    private String displayUpdateUser;
+    private String updateUserDesc;
 #foreach($field in ${tableInfo.tableFields})
     #if(${field.filed} == "status")
 
     /**
     * 显示状态
     **/
-    private String displayStatus;
+    private String statusDesc;
     #end
     #if(${field.filed} == "type")
 
     /**
     * 显示类型
     **/
-    private String displayType;
+    private String typeDesc;
     #end
     #if(${field.filed} == "skuId")
 
@@ -108,8 +108,8 @@ public class ${tableInfo.beanName}Vo extends ${tableInfo.beanName} {
     public ${tableInfo.beanName}Vo(${tableInfo.beanName} pojo) {
         if (null != pojo) {
             BeanUtils.copyProperties(pojo, this);
-            this.setDisplayCreateTime(DateUtil.format(pojo.getCreateTime(), DateUtil.YYMMDD_HHmmSS));
-            this.setDisplayUpdateTime(DateUtil.format(pojo.getUpdateTime(), DateUtil.YYMMDD_HHmmSS));
+            this.setCreateTimeDesc(DateUtil.format(pojo.getCreateTime(), DateUtil.YYMMDD));
+            this.setUpdateTimeDesc(DateUtil.format(pojo.getUpdateTime(), DateUtil.YYMMDD));
         }
     }
 

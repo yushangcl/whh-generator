@@ -1,0 +1,71 @@
+package ${enumPackage};
+
+import lombok.Getter;
+
+/**
+ * ${tableInfo.beanName}${enum}  ${tableInfo.tableComment}枚举
+ *
+ * @author ${authorName} (;￢＿￢) 
+ * @version ${version}
+ * @date $date
+ **/
+@Getter
+public enum ${tableInfo.beanName}${enum}Enum {
+
+    /**
+     * 枚举
+     */
+    ENUMS(0, "枚举"),
+
+    ;
+
+    /**
+     * 状态
+     */
+    private Integer code;
+
+    /**
+     * 说明
+     */
+    private String name;
+
+    ${tableInfo.beanName}${enum}Enum(Integer code, String name) {
+        this.code = code;
+        this.name = name;
+    }
+
+    public static ${tableInfo.beanName}${enum}Enum findByCode(Integer code) {
+        for (${tableInfo.beanName}${enum}Enum type : values()) {
+            if (type.getCode().equals(code)) {
+                return type;
+            }
+        }
+        return null;
+    }
+
+    public static ${tableInfo.beanName}${enum}Enum findByName(String name) {
+        for (${tableInfo.beanName}${enum}Enum type : values()) {
+            if (type.getName().equals(name)) {
+                return type;
+            }
+        }
+        return null;
+    }
+
+    public static String findNameByCode(Integer code) {
+        for (${tableInfo.beanName}${enum}Enum type : values()) {
+            if (type.getCode().equals(code)) {
+                return type.name;
+            }
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        StringBuilder str = new StringBuilder();
+        for (${tableInfo.beanName}${enum}Enum typeEnum : values()) {
+            str.append(typeEnum.getCode()).append(": ").append(typeEnum.getName()).append("; ");
+        }
+        System.out.println("【"+str.toString()+"】");
+    }
+}

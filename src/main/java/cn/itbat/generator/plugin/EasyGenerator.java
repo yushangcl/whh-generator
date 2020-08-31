@@ -11,8 +11,8 @@ import org.apache.velocity.VelocityContext;
 
 import java.io.IOException;
 import java.sql.*;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 
 /**
  * @author huahui.wu
@@ -30,6 +30,7 @@ public class EasyGenerator {
     private String serviceImplPath;
     private String controllerPath;
     private String criteriaPath;
+    private String enumsPath;
 
     private String base_package;
 
@@ -38,6 +39,7 @@ public class EasyGenerator {
 
     private TableInfo tableInfo;
     private VelocityContext context;
+    private String[] methods;
 
 
     public EasyGenerator() {
@@ -59,13 +61,15 @@ public class EasyGenerator {
         String model = generatorProps.getProperty("model");
         base_package = generatorProps.getProperty("package");
         String basePackage = generatorProps.getProperty("base_package").replace("{model}", model);
-        apiPath = generatorProps.getProperty("api_path").replace("{model}", model);
-        webPath = generatorProps.getProperty("web_path").replace("{model}", model);
+        String prefixPath = generatorProps.getProperty("prefix_path");
+        apiPath = prefixPath + generatorProps.getProperty("api_path").replace("{model}", model);
+        webPath = prefixPath + generatorProps.getProperty("web_path").replace("{model}", model);
         xmlPath = webPath + OSTypeUtil.getSeparator() + "src" + OSTypeUtil.getSeparator() + "main" + OSTypeUtil.getSeparator() + "resources" + OSTypeUtil.getSeparator() + "mapper";
         webPath = webPath + OSTypeUtil.getSeparator() + "src" + OSTypeUtil.getSeparator() + "main" + OSTypeUtil.getSeparator() + "java" + OSTypeUtil.getSeparator() + basePackage.replace(".", OSTypeUtil.getSeparator());
         apiPath = apiPath + OSTypeUtil.getSeparator() + "src" + OSTypeUtil.getSeparator() + "main" + OSTypeUtil.getSeparator() + "java" + OSTypeUtil.getSeparator() + basePackage.replace(".", OSTypeUtil.getSeparator());
 
         beanPath = apiPath + OSTypeUtil.getSeparator() + "base" + OSTypeUtil.getSeparator() + "model";
+        enumsPath = apiPath + OSTypeUtil.getSeparator() + "base" + OSTypeUtil.getSeparator() + "enums";
         voPath = apiPath + OSTypeUtil.getSeparator() + "base" + OSTypeUtil.getSeparator() + "vo";
         criteriaPath = apiPath + OSTypeUtil.getSeparator() + "base" + OSTypeUtil.getSeparator() + "criteria";
         mapperPath = webPath + OSTypeUtil.getSeparator() + "mapper";
@@ -95,6 +99,7 @@ public class EasyGenerator {
         context.put("servicePackage", basePackage + ".service");
         context.put("controllerPackage", basePackage + ".controller");
         context.put("apiPackage", basePackage + ".api");
+        context.put("enumPackage", basePackage + ".base.enums");
         context.put("model", model);
         context.put("version", version);
         context.put("authorName", authorName);
@@ -102,7 +107,8 @@ public class EasyGenerator {
 
         String methodStr = generatorProps.getProperty("method");
         if (StringUtils.isNotBlank(methodStr)) {
-            context.put("methods", methodStr.split(";"));
+            methods = methodStr.split(";");
+            context.put("methods", methods);
         }
 
     }
@@ -255,6 +261,26 @@ public class EasyGenerator {
         VelocityUtil.generate("template/api.vm", apiPath + "\\api\\" + tableInfo.getBeanName() + "Api.java", context);
     }
 
+    // 是否生成枚举
+
+
+    /**
+     * 构建Enums文件
+     */
+    private void buildEnum() {
+        context.put("tableInfo", tableInfo);
+        for (TableField tableField : tableInfo.getTableFields()) {
+            if (tableField.getFiled().equals("status")) {
+                context.put("enum", "Status");
+                VelocityUtil.generate("template/Enum.vm", enumsPath + "\\" + tableInfo.getBeanName() + "StatusEnum.java", context);
+            }
+            if (tableField.getFiled().equals("type")) {
+                context.put("enum", "Type");
+                VelocityUtil.generate("template/Enum.vm", enumsPath + "\\" + tableInfo.getBeanName() + "TypeEnum.java", context);
+            }
+        }
+    }
+
     /**
      * 获取所有的表
      *
@@ -289,9 +315,6 @@ public class EasyGenerator {
                 String tableName = results.getString("NAME");
                 String comment = results.getString("COMMENT");
                 maps.put(tableName, comment);
-                if (tableName.contains("detail")) {
-                    context.put("methods", null);
-                }
             }
         } catch (Exception e) {
             System.out.println("=============erro: " + e + "=======================");
@@ -309,6 +332,12 @@ public class EasyGenerator {
             // 多表
             if ("".equals(tableName) || !table.equals(tableName)) {
                 continue;
+            }
+            // 明细问题处理
+            if (tableName.contains("detail")) {
+                context.put("methods", null);
+            } else {
+                context.put("methods", methods);
             }
             tableInfo = new TableInfo();
             List<TableField> tableFields = new ArrayList<>();
@@ -389,6 +418,7 @@ public class EasyGenerator {
                         //all
                         buildCriteria();
                         buildEntityBean();
+                        buildEnum();
                         buildVo();
                         buildMapper();
                         buildMapperXml();

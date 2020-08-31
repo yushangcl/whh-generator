@@ -8,7 +8,6 @@ import ${commonPackage}.entity.Pager;
 import ${commonPackage}.constants.CommonConstant;
 import ${commonPackage}.entity.ExcelParamDto;
 import ${commonPackage}.util.ExcelCommonUtils;
-import ${commonPackage}.common.util.ExcelCommonUtils;
     #end
 #end
 import ${commonPackage}.vo.BaseResultVo;

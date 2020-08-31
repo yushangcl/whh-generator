@@ -1,8 +1,7 @@
 package ${mapperPackage};
 
 import ${beanPackage}.${tableInfo.beanName};
-import tk.mybatis.mapper.additional.insert.InsertListMapper;
-import tk.mybatis.mapper.common.Mapper;
+import ${commonPackage}.service.ScsMapper;
 
 /**
  * ${tableInfo.beanName}Mapper 数据库操作接口类
@@ -11,7 +10,7 @@ import tk.mybatis.mapper.common.Mapper;
  * @version ${version}
  * @date $date
  **/
-public interface ${tableInfo.beanName}Mapper extends Mapper<${tableInfo.beanName}>, InsertListMapper<${tableInfo.beanName}> {
+public interface ${tableInfo.beanName}Mapper extends ScsMapper<${tableInfo.beanName}> {
 
 
 }

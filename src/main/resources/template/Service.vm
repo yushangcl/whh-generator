@@ -4,6 +4,8 @@ import com.github.pagehelper.PageInfo;
 import ${commonPackage}.entity.Pager;
 import ${beanPackage}.${tableInfo.beanName};
 import ${voPackage}.${tableInfo.beanName}Vo;
+import java.util.Map;
+import java.util.List;
 
 /**
  * ${tableInfo.beanName}Service   ${tableInfo.tableComment}
@@ -22,8 +24,45 @@ public interface ${tableInfo.beanName}Service {
      */
     ${tableInfo.beanName} selectById(Long id);
 
+    /**
+    * 插入同一入口
+    *
+    * @param ${tableInfo.shortBeanName} 对象
+    * @return 插入数量
+    */
+    int insertSelectiveExcute(${tableInfo.beanName} ${tableInfo.shortBeanName});
+
+    /**
+    * 更新同一入口
+    *
+    * @param ${tableInfo.shortBeanName}       对象
+    * @param hasSelective 是：执行更新非空字段；否：更新所有字段
+    * @return 更新数量
+    */
+    int updateByIdExcute(${tableInfo.beanName} ${tableInfo.shortBeanName}, boolean hasSelective);
 #foreach($method in ${methods})
+    #if(${method} == "selectVoByIds")
+
+    /**
+    * 根据主键集合查询（返回List<vo>）
+    *
+    * @param ids 主键集合
+    * @return List<${tableInfo.beanName}Vo>
+    */
+    List<${tableInfo.beanName}Vo> selectVoByIds(List<Long> ids);
+    #end
+    #if(${method} == "selectVoMapByIds")
+
+    /**
+    * 根据主键集合查询（返回Map<id,vo>）
+    *
+    * @param ids 主键集合
+    * @return Map
+    */
+    Map<Long, ${tableInfo.beanName}Vo> selectVoMapByIds(List<Long> ids);
+    #end
     #if(${method} == "list")
+
     /**
      * 分页查询
      *
@@ -33,8 +72,8 @@ public interface ${tableInfo.beanName}Service {
      */
     PageInfo<${tableInfo.beanName}Vo> list(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo, Pager pager);
     #end
-
     #if(${method} == "getInfo")
+
     /**
      * 详情查询
      *
@@ -43,8 +82,8 @@ public interface ${tableInfo.beanName}Service {
      */
     ${tableInfo.beanName}Vo getInfo(Long id);
     #end
-
     #if(${method} == "save")
+
     /**
      * 保存
      *
@@ -52,8 +91,8 @@ public interface ${tableInfo.beanName}Service {
      */
     void save(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo);
     #end
-
     #if(${method} == "deleted")
+
     /**
      * 删除操作
      *

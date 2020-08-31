@@ -7,10 +7,8 @@ import com.github.pagehelper.PageInfo;
 import com.dangdang.ddframe.rdb.sharding.id.generator.IdGenerator;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.BeanUtils;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import org.springframework.util.CollectionUtils;
+import java.util.*;
 #if($lock)
 import java.util.concurrent.TimeUnit;
 #end
@@ -65,6 +63,7 @@ public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Se
     @Resource
     private ${tableInfo.beanName}Mapper ${tableInfo.shortBeanName}Mapper;
 #if($methods && $methods.size() > 0)
+
     @Resource
     private SysUserApi sysUserApi;
 
@@ -112,31 +111,73 @@ public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Se
         return ${tableInfo.shortBeanName};
     }
 
+    @Override
+    public int insertSelectiveExcute(${tableInfo.beanName} ${tableInfo.shortBeanName}) {
+        ${tableInfo.shortBeanName}.setDeleted(DeletedEnum.NORMAL.getCode());
+        return testMapper.insertSelective(${tableInfo.shortBeanName});
+    }
+
+    @Override
+    public int updateByIdExcute(${tableInfo.beanName} ${tableInfo.shortBeanName}, boolean hasSelective) {
+        if (${tableInfo.shortBeanName}.getId() == null) {
+            throw new BaseException("主键不存在！");
+        }
+        if (hasSelective) {
+            return testMapper.updateByPrimaryKeySelective(${tableInfo.shortBeanName});
+        }
+        return testMapper.updateByPrimaryKey(${tableInfo.shortBeanName});
+    }
 #foreach($method in ${methods})
+    #if(${method} == "selectVoByIds")
+
+    @Override
+    public List<${tableInfo.beanName}Vo> selectVoByIds(List<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return null;
+        }
+        List<${tableInfo.beanName}> ${tableInfo.shortBeanName}s = ${tableInfo.shortBeanName}Mapper.selectByIdList(ids);
+        return CollectionUtils.isEmpty(${tableInfo.shortBeanName}s) ? null : ${tableInfo.shortBeanName}s.stream().filter(l -> DeletedEnum.NORMAL.getCode().equals(l.getDeleted())).map(${tableInfo.beanName}Vo::new).collect(Collectors.toList());
+    }
+    #end
+    #if(${method} == "selectVoMapByIds")
+
+    @Override
+    public Map<Long, ${tableInfo.beanName}Vo> selectVoMapByIds(List<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return new HashMap<>(0);
+        }
+        List<${tableInfo.beanName}> ${tableInfo.shortBeanName}s = ${tableInfo.shortBeanName}Mapper.selectByIdList(ids);
+        if (CollectionUtils.isEmpty(${tableInfo.shortBeanName}s)) {
+            return new HashMap<>(0);
+        }
+        return ${tableInfo.shortBeanName}s.stream().filter(l -> DeletedEnum.NORMAL.getCode().equals(l.getDeleted())).collect(Collectors.toMap(${tableInfo.beanName}::getId, ${tableInfo.beanName}Vo::new, (k1, k2) -> k1));
+    }
+    #end
     #if(${method} == "list")
+
     @Override
     public PageInfo<${tableInfo.beanName}Vo> list(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo, Pager pager) {
         ${tableInfo.beanName}Criteria example = new ${tableInfo.beanName}Criteria();
         ${tableInfo.beanName}Criteria.Criteria criteria = example.createCriteria();
-        criteria.andDeletedEqualTo(DeletedEnum.NORMAL.getCode());
+            criteria.andDeletedEqualTo(DeletedEnum.NORMAL.getCode());
         // 时间
         if (${tableInfo.shortBeanName}Vo.getStartTime() != null) {
-        criteria.andCreateTimeGreaterThan(${tableInfo.shortBeanName}Vo.getStartTime());
+            criteria.andCreateTimeGreaterThan(${tableInfo.shortBeanName}Vo.getStartTime());
         }
         if (${tableInfo.shortBeanName}Vo.getEndTime() != null) {
-        criteria.andCreateTimeLessThan(${tableInfo.shortBeanName}Vo.getEndTime());
+            criteria.andCreateTimeLessThan(${tableInfo.shortBeanName}Vo.getEndTime());
         }
         // 创建人
         if (${tableInfo.shortBeanName}Vo.getCreateUser() != null) {
-        criteria.andCreateUserEqualTo(${tableInfo.shortBeanName}Vo.getCreateUser());
+            criteria.andCreateUserEqualTo(${tableInfo.shortBeanName}Vo.getCreateUser());
         }
         // 更新人
         if (${tableInfo.shortBeanName}Vo.getCreateUser() != null) {
-        criteria.andCreateUserEqualTo(${tableInfo.shortBeanName}Vo.getCreateUser());
+            criteria.andCreateUserEqualTo(${tableInfo.shortBeanName}Vo.getCreateUser());
         }
     #foreach($field in ${tableInfo.tableFields})
         #if(${field.filed} == "status")
-        if (${tableInfo.shortBeanName}Vo.getCreateUser() != null) {
+        if (${tableInfo.shortBeanName}Vo.getStatus() != null) {
             criteria.andStatusEqualTo(${tableInfo.shortBeanName}Vo.getStatus());
         }
         #end
@@ -198,8 +239,8 @@ public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Se
         for (${tableInfo.beanName} ${tableInfo.shortBeanName} : ${tableInfo.shortBeanName}s) {
             ${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo = new ${tableInfo.beanName}Vo(${tableInfo.shortBeanName});
             // 创建人
-            ${tableInfo.shortBeanName}Vo.setDisplayCreateUser(userVoMap.get(${tableInfo.shortBeanName}.getCreateUser()).getUserName());
-            ${tableInfo.shortBeanName}Vo.setDisplayUpdateUser(userVoMap.get(${tableInfo.shortBeanName}.getUpdateUser()).getUserName());
+            ${tableInfo.shortBeanName}Vo.setCreateUserDesc(userVoMap.get(${tableInfo.shortBeanName}.getCreateUser()).getUserName());
+            ${tableInfo.shortBeanName}Vo.setUpdateUserDesc(userVoMap.get(${tableInfo.shortBeanName}.getUpdateUser()).getUserName());
    #foreach($field in ${tableInfo.tableFields})
        #if(${field.filed} == "skuId")
             // sku信息
@@ -230,7 +271,6 @@ public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Se
         }
         return ${tableInfo.shortBeanName}Vos;
     }
-
     #end
     #if(${method} == "getInfo")
     @Override
@@ -254,8 +294,8 @@ public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Se
     #end
 #end
 
-        ${tableInfo.shortBeanName}Vo.setDisplayCreateUser(userVoMap.get(${tableInfo.shortBeanName}.getCreateUser()).getUserName());
-        ${tableInfo.shortBeanName}Vo.setDisplayCreateUser(userVoMap.get(${tableInfo.shortBeanName}.getUpdateUser()).getUserName());
+        ${tableInfo.shortBeanName}Vo.setCreateUserDesc(userVoMap.get(${tableInfo.shortBeanName}.getCreateUser()).getUserName());
+        ${tableInfo.shortBeanName}Vo.setCreateUserDesc(userVoMap.get(${tableInfo.shortBeanName}.getUpdateUser()).getUserName());
 #foreach($field in ${tableInfo.tableFields})
     #if(${field.filed} == "skuId")
         // sku信息
@@ -307,7 +347,7 @@ public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Se
     private void add(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo) {
         // todo
 
-        ${tableInfo.shortBeanName}Mapper.insertSelective(${tableInfo.shortBeanName}Vo);
+        this.insertSelectiveExcute(${tableInfo.shortBeanName}Vo);
         if (log.isInfoEnabled()) {
         log.info("【${tableInfo.tableComment}】《新增操作》，主键：{}，详情：{}", ${tableInfo.shortBeanName}Vo.getId(), JSONObject.toJSONString(${tableInfo.shortBeanName}Vo));
         }

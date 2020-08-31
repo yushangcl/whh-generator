@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TableInfo implements Serializable {
+public class  TableInfo implements Serializable {
 
     private String tableName;
 
