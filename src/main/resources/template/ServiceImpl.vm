@@ -112,20 +112,20 @@ public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Se
     }
 
     @Override
-    public int insertSelectiveExcute(${tableInfo.beanName} ${tableInfo.shortBeanName}) {
+    public int insertSelectiveExecute(${tableInfo.beanName} ${tableInfo.shortBeanName}) {
         ${tableInfo.shortBeanName}.setDeleted(DeletedEnum.NORMAL.getCode());
-        return testMapper.insertSelective(${tableInfo.shortBeanName});
+        return ${tableInfo.shortBeanName}Mapper.insertSelective(${tableInfo.shortBeanName});
     }
 
     @Override
-    public int updateByIdExcute(${tableInfo.beanName} ${tableInfo.shortBeanName}, boolean hasSelective) {
+    public int updateByIdExecute(${tableInfo.beanName} ${tableInfo.shortBeanName}, boolean hasSelective) {
         if (${tableInfo.shortBeanName}.getId() == null) {
             throw new BaseException("主键不存在！");
         }
         if (hasSelective) {
-            return testMapper.updateByPrimaryKeySelective(${tableInfo.shortBeanName});
+            return ${tableInfo.shortBeanName}Mapper.updateByPrimaryKeySelective(${tableInfo.shortBeanName});
         }
-        return testMapper.updateByPrimaryKey(${tableInfo.shortBeanName});
+        return ${tableInfo.shortBeanName}Mapper.updateByPrimaryKey(${tableInfo.shortBeanName});
     }
 #foreach($method in ${methods})
     #if(${method} == "selectVoByIds")
@@ -192,7 +192,7 @@ public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Se
         }
         #end
         #if(${field.filed} == "customerId")
-        if (${tableInfo.shortBeanName}Vo.getWarehouseId() != null) {
+        if (${tableInfo.shortBeanName}Vo.getCustomerId() != null) {
             criteria.andCustomerIdEqualTo(${tableInfo.shortBeanName}Vo.getCustomerId());
         }
         #end
@@ -295,7 +295,7 @@ public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Se
 #end
 
         ${tableInfo.shortBeanName}Vo.setCreateUserDesc(userVoMap.get(${tableInfo.shortBeanName}.getCreateUser()).getUserName());
-        ${tableInfo.shortBeanName}Vo.setCreateUserDesc(userVoMap.get(${tableInfo.shortBeanName}.getUpdateUser()).getUserName());
+        ${tableInfo.shortBeanName}Vo.setUpdateUserDesc(userVoMap.get(${tableInfo.shortBeanName}.getUpdateUser()).getUserName());
 #foreach($field in ${tableInfo.tableFields})
     #if(${field.filed} == "skuId")
         // sku信息
@@ -347,7 +347,7 @@ public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Se
     private void add(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo) {
         // todo
 
-        this.insertSelectiveExcute(${tableInfo.shortBeanName}Vo);
+        this.insertSelectiveExecute(${tableInfo.shortBeanName}Vo);
         if (log.isInfoEnabled()) {
         log.info("【${tableInfo.tableComment}】《新增操作》，主键：{}，详情：{}", ${tableInfo.shortBeanName}Vo.getId(), JSONObject.toJSONString(${tableInfo.shortBeanName}Vo));
         }

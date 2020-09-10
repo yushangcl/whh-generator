@@ -5,7 +5,9 @@ import cn.itbat.generator.model.TableField;
 import cn.itbat.generator.model.TableInfo;
 import cn.itbat.generator.utils.DateUtil;
 import cn.itbat.generator.utils.OSTypeUtil;
+import cn.itbat.generator.utils.ScsUtil;
 import cn.itbat.generator.utils.VelocityUtil;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 
@@ -20,6 +22,8 @@ import java.util.*;
  */
 public class EasyGenerator {
 
+    @Getter
+    private String prefixPath;
     private String apiPath;
     private String webPath;
     private String xmlPath;
@@ -31,6 +35,7 @@ public class EasyGenerator {
     private String controllerPath;
     private String criteriaPath;
     private String enumsPath;
+
 
     private String base_package;
 
@@ -61,7 +66,7 @@ public class EasyGenerator {
         String model = generatorProps.getProperty("model");
         base_package = generatorProps.getProperty("package");
         String basePackage = generatorProps.getProperty("base_package").replace("{model}", model);
-        String prefixPath = generatorProps.getProperty("prefix_path");
+        prefixPath = generatorProps.getProperty("prefix_path");
         apiPath = prefixPath + generatorProps.getProperty("api_path").replace("{model}", model);
         webPath = prefixPath + generatorProps.getProperty("web_path").replace("{model}", model);
         xmlPath = webPath + OSTypeUtil.getSeparator() + "src" + OSTypeUtil.getSeparator() + "main" + OSTypeUtil.getSeparator() + "resources" + OSTypeUtil.getSeparator() + "mapper";
@@ -470,7 +475,7 @@ public class EasyGenerator {
             }
             System.out.println("===============" + tableInfo.getBeanName() + " success !!!!===============");
         }
-
+//        ScsUtil.afterHandler(this);
         try {
             conn.close();
         } catch (Exception e) {

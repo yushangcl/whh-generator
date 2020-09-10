@@ -30,7 +30,7 @@ public interface ${tableInfo.beanName}Service {
     * @param ${tableInfo.shortBeanName} 对象
     * @return 插入数量
     */
-    int insertSelectiveExcute(${tableInfo.beanName} ${tableInfo.shortBeanName});
+    int insertSelectiveExecute(${tableInfo.beanName} ${tableInfo.shortBeanName});
 
     /**
     * 更新同一入口
@@ -39,7 +39,7 @@ public interface ${tableInfo.beanName}Service {
     * @param hasSelective 是：执行更新非空字段；否：更新所有字段
     * @return 更新数量
     */
-    int updateByIdExcute(${tableInfo.beanName} ${tableInfo.shortBeanName}, boolean hasSelective);
+    int updateByIdExecute(${tableInfo.beanName} ${tableInfo.shortBeanName}, boolean hasSelective);
 #foreach($method in ${methods})
     #if(${method} == "selectVoByIds")
 
