@@ -22,12 +22,12 @@ public enum ${tableInfo.beanName}${enum}Enum {
     /**
      * 状态
      */
-    private Integer code;
+    private final Integer code;
 
     /**
      * 说明
      */
-    private String name;
+    private final String name;
 
     ${tableInfo.beanName}${enum}Enum(Integer code, String name) {
         this.code = code;

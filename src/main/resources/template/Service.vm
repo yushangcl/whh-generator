@@ -2,6 +2,7 @@ package ${servicePackage};
 
 import com.github.pagehelper.PageInfo;
 import ${commonPackage}.entity.Pager;
+import ${commonPackage}.service.ScsService;
 import ${beanPackage}.${tableInfo.beanName};
 import ${voPackage}.${tableInfo.beanName}Vo;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.List;
  * @version ${version}
  * @date $date
  **/
-public interface ${tableInfo.beanName}Service {
+public interface ${tableInfo.beanName}Service extends ScsService<${tableInfo.beanName}> {
 
     /**
      * 根据主键查询（已判断 deleted 返回 null）

@@ -5,7 +5,6 @@ import cn.itbat.generator.model.TableField;
 import cn.itbat.generator.model.TableInfo;
 import cn.itbat.generator.utils.DateUtil;
 import cn.itbat.generator.utils.OSTypeUtil;
-import cn.itbat.generator.utils.ScsUtil;
 import cn.itbat.generator.utils.VelocityUtil;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -275,13 +274,9 @@ public class EasyGenerator {
     private void buildEnum() {
         context.put("tableInfo", tableInfo);
         for (TableField tableField : tableInfo.getTableFields()) {
-            if (tableField.getFiled().equals("status")) {
-                context.put("enum", "Status");
-                VelocityUtil.generate("template/Enum.vm", enumsPath + "\\" + tableInfo.getBeanName() + "StatusEnum.java", context);
-            }
-            if (tableField.getFiled().equals("type")) {
-                context.put("enum", "Type");
-                VelocityUtil.generate("template/Enum.vm", enumsPath + "\\" + tableInfo.getBeanName() + "TypeEnum.java", context);
+            if (tableField.getFiled().contains("status") || tableField.getFiled().contains("type")) {
+                context.put("enum", processFieldUp(processField(tableField.getFiled())));
+                VelocityUtil.generate("template/Enum.vm", enumsPath + "\\" + tableInfo.getBeanName() + processFieldUp(processField(tableField.getFiled())) + "Enum.java", context);
             }
         }
     }

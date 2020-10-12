@@ -17,6 +17,7 @@ import ${base_package}.common.exception.BaseException;
 #if($lock)
 import ${commonPackage}.redisson.lock.LockManagerAnnotation;
 import ${commonPackage}.redisson.lock.LockManagerUtil;
+import ${commonPackage}.service.BaseScsServiceSupport;
 #end
 import ${base_package}.admin.api.SysUserApi;
 import ${base_package}.admin.base.vo.UserVo;
@@ -58,7 +59,7 @@ import javax.annotation.Resource;
  **/
 @Slf4j
 @Service("${tableInfo.shortBeanName}Service")
-public class ${tableInfo.beanName}ServiceImpl implements ${tableInfo.beanName}Service {
+public class ${tableInfo.beanName}ServiceImpl extends BaseScsServiceSupport<${tableInfo.beanName}> implements ${tableInfo.beanName}Service {
 
     @Resource
     private ${tableInfo.beanName}Mapper ${tableInfo.shortBeanName}Mapper;
