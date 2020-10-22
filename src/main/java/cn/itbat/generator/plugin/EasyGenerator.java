@@ -265,16 +265,13 @@ public class EasyGenerator {
         VelocityUtil.generate("template/api.vm", apiPath + "\\api\\" + tableInfo.getBeanName() + "Api.java", context);
     }
 
-    // 是否生成枚举
-
-
     /**
      * 构建Enums文件
      */
     private void buildEnum() {
         context.put("tableInfo", tableInfo);
         for (TableField tableField : tableInfo.getTableFields()) {
-            if (tableField.getFiled().contains("status") || tableField.getFiled().contains("type")) {
+            if (tableField.getFiled().contains("status") || tableField.getFiled().contains("Status") || tableField.getFiled().contains("type") || tableField.getFiled().contains("Type")) {
                 context.put("enum", processFieldUp(processField(tableField.getFiled())));
                 VelocityUtil.generate("template/Enum.vm", enumsPath + "\\" + tableInfo.getBeanName() + processFieldUp(processField(tableField.getFiled())) + "Enum.java", context);
             }
@@ -350,7 +347,8 @@ public class EasyGenerator {
                             .property(processField(results.getString("FIELD")))
                             .upFiled(processFieldUp(results.getString("FIELD")))
                             .type(processType(results.getString("TYPE")))
-                            .comment(results.getString("COMMENT")).build());
+                            .comment(results.getString("COMMENT"))
+                            .build());
                 }
             } catch (Exception e) {
                 System.out.println("=============error: " + e + "==================");
@@ -364,6 +362,12 @@ public class EasyGenerator {
             StringBuilder fileds = new StringBuilder();
             for (TableField tableField : tableFields) {
                 fileds.append("`").append(tableField.getFiled()).append("`").append(",");
+                if (tableField.getFiled().contains("status") || tableField.getFiled().contains("Status")) {
+                    tableField.setNeedEnum("status");
+                }
+                if (tableField.getFiled().contains("type") || tableField.getFiled().contains("Type")) {
+                    tableField.setNeedEnum("type");
+                }
             }
             tableInfo.setFileds(fileds.toString().substring(0, fileds.toString().length() - 1));
         }
@@ -461,6 +465,7 @@ public class EasyGenerator {
                         buildEntityBean();
 //                        buildMapper();
                         buildMapperXml();
+//                        buildEnum();
                         break;
                     default:
                 }

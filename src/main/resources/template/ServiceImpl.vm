@@ -14,15 +14,16 @@ import java.util.concurrent.TimeUnit;
 #end
 import java.util.stream.Collectors;
 import ${base_package}.common.exception.BaseException;
+import ${commonPackage}.service.BaseScsServiceSupport;
+import ${commonPackage}.util.user.UserInfoUtil;
 #if($lock)
 import ${commonPackage}.redisson.lock.LockManagerAnnotation;
 import ${commonPackage}.redisson.lock.LockManagerUtil;
-import ${commonPackage}.service.BaseScsServiceSupport;
 #end
 import ${base_package}.admin.api.SysUserApi;
 import ${base_package}.admin.base.vo.UserVo;
 import ${commonPackage}.entity.Pager;
-import ${commonPackage}.util.user.UserInfoUtil;
+
 import ${base_package}.${model}.base.criteria.${tableInfo.beanName}Criteria;
 #foreach($field in ${tableInfo.tableFields})
     #if(${field.filed} == "skuId")
@@ -154,6 +155,27 @@ public class ${tableInfo.beanName}ServiceImpl extends BaseScsServiceSupport<${ta
         return ${tableInfo.shortBeanName}s.stream().filter(l -> DeletedEnum.NORMAL.getCode().equals(l.getDeleted())).collect(Collectors.toMap(${tableInfo.beanName}::getId, ${tableInfo.beanName}Vo::new, (k1, k2) -> k1));
     }
     #end
+    #if(${method} == "selectByCondition")
+
+    @Override
+    public List<${tableInfo.beanName}> selectByCondition(Integer type, Long bidId) {
+        return ${tableInfo.shortBeanName}Mapper.select(${tableInfo.beanName}.builder().deleted(DeletedEnum.NORMAL.getCode()).type(type).bidId(bidId).build());
+    }
+
+    @Override
+    public List<${tableInfo.beanName}Vo> selectVoByCondition(Integer type, Long bidId) {
+        List<${tableInfo.beanName}> ${tableInfo.shortBeanName}s = this.selectByCondition(type, bidId);
+        if (CollectionUtils.isEmpty(${tableInfo.shortBeanName}s)) {
+            return null;
+        }
+        List<${tableInfo.beanName}Vo> ${tableInfo.shortBeanName}Vos = new ArrayList<>();
+        for (${tableInfo.beanName} ${tableInfo.shortBeanName} : ${tableInfo.shortBeanName}s) {
+            ${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo = new ${tableInfo.beanName}Vo(${tableInfo.shortBeanName});
+            ${tableInfo.shortBeanName}Vos.add(${tableInfo.shortBeanName}Vo);
+        }
+        return ${tableInfo.shortBeanName}Vos;
+     }
+    #end
     #if(${method} == "list")
 
     @Override
@@ -163,10 +185,10 @@ public class ${tableInfo.beanName}ServiceImpl extends BaseScsServiceSupport<${ta
             criteria.andDeletedEqualTo(DeletedEnum.NORMAL.getCode());
         // 时间
         if (${tableInfo.shortBeanName}Vo.getStartTime() != null) {
-            criteria.andCreateTimeGreaterThan(${tableInfo.shortBeanName}Vo.getStartTime());
+            criteria.andCreateTimeGreaterThanOrEqualTo(${tableInfo.shortBeanName}Vo.getStartTime());
         }
         if (${tableInfo.shortBeanName}Vo.getEndTime() != null) {
-            criteria.andCreateTimeLessThan(${tableInfo.shortBeanName}Vo.getEndTime());
+            criteria.andCreateTimeLessThanOrEqualTo(${tableInfo.shortBeanName}Vo.getEndTime());
         }
         // 创建人
         if (${tableInfo.shortBeanName}Vo.getCreateUser() != null) {
@@ -200,7 +222,7 @@ public class ${tableInfo.beanName}ServiceImpl extends BaseScsServiceSupport<${ta
     #end
 
         // todo
-        example.setOrderByClause("update_time desc");
+        example.setOrderByClause("id desc");
         if (pager != null) {
             if (null != pager.getPageSize() && null != pager.getPageIndex()) {
                 PageHelper.startPage(pager.getPageIndex(), pager.getPageSize());

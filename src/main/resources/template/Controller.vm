@@ -35,7 +35,7 @@ public class ${tableInfo.beanName}Controller {
 #foreach($method in ${methods})
     #if(${method} == "list")
     /**
-     * ${tableInfo.tableComment}-分页查询
+     * 分页查询
      *
      * @param ${tableInfo.shortBeanName}Vo 查询参数
      * @param pager             分页参数
@@ -49,7 +49,7 @@ public class ${tableInfo.beanName}Controller {
     #end
     #if(${method} == "getInfo")
     /**
-     * ${tableInfo.tableComment}-详情查询
+     * 详情查询
      *
      * @param id 主键
      * @return ${tableInfo.beanName}Vo
@@ -62,7 +62,7 @@ public class ${tableInfo.beanName}Controller {
     #end
     #if(${method} == "export")
     /**
-     * ${tableInfo.tableComment}-导出
+     * 导出
      *
      * @param ${tableInfo.shortBeanName}Vo 查询参数
      * @param pager             分页参数
@@ -79,7 +79,7 @@ public class ${tableInfo.beanName}Controller {
     #end
     #if(${method} == "save")
     /**
-     * ${tableInfo.tableComment}-保存
+     * 保存
      *
      * @param ${tableInfo.shortBeanName}Vo 参数
      */
@@ -96,7 +96,7 @@ public class ${tableInfo.beanName}Controller {
     #end
     #if(${method} == "deleted")
     /**
-    * ${tableInfo.tableComment}-删除
+    * 删除
     *
     * @param id 主键
     */

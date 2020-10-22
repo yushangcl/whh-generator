@@ -43,19 +43,19 @@ public class ${tableInfo.beanName}Vo extends ${tableInfo.beanName} {
      **/
     private String updateUserDesc;
 #foreach($field in ${tableInfo.tableFields})
-    #if(${field.filed} == "status")
+    #if(${field.needEnum} == "status")
 
     /**
-    * 显示状态
+    * 显示${field.comment}
     **/
-    private String statusDesc;
+    private String ${field.property}Desc;
     #end
-    #if(${field.filed} == "type")
+    #if(${field.needEnum} == "type")
 
     /**
-    * 显示类型
+    * 显示${field.comment}
     **/
-    private String typeDesc;
+    private String ${field.property}Desc;
     #end
     #if(${field.filed} == "skuId")
 
@@ -113,6 +113,14 @@ public class ${tableInfo.beanName}Vo extends ${tableInfo.beanName} {
             BeanUtils.copyProperties(pojo, this);
             this.setCreateTimeDesc(DateUtil.format(pojo.getCreateTime(), DateUtil.YYMMDD));
             this.setUpdateTimeDesc(DateUtil.format(pojo.getUpdateTime(), DateUtil.YYMMDD));
+#foreach($field in ${tableInfo.tableFields})
+    #if(${field.needEnum} == "status")
+            this.set${field.upFiled}Desc(BiddingEntryStatusEnum.findNameByCode(pojo.get${field.upFiled}()));
+    #end
+    #if(${field.needEnum} == "type")
+            this.set${field.upFiled}Desc(BiddingEntryStatusEnum.findNameByCode(pojo.get${field.upFiled}()));
+    #end
+#end
         }
     }
 

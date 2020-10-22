@@ -39,4 +39,10 @@ public class TableField {
      */
     private String upFiled;
 
+    /**
+     * 需要生成 enum
+     */
+    @Builder.Default
+    private String needEnum ="common";
+
 }

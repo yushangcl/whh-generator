@@ -62,6 +62,27 @@ public interface ${tableInfo.beanName}Service extends ScsService<${tableInfo.bea
     */
     Map<Long, ${tableInfo.beanName}Vo> selectVoMapByIds(List<Long> ids);
     #end
+    #if(${method} == "selectByCondition")
+
+    /**
+     * 根据条件查询
+     *
+     * @param type  类型
+     * @param bidId 招标主键
+     * @return List<${tableInfo.beanName}>
+     */
+    List<${tableInfo.beanName}> selectByCondition(Integer type, Long bidId);
+
+    /**
+     * 根据条件查询
+     *
+     * @param type  类型
+     * @param bidId 招标主键
+     * @return List<${tableInfo.beanName}Vo>
+     */
+    List<${tableInfo.beanName}Vo> selectVoByCondition(Integer type, Long bidId);
+
+    #end
     #if(${method} == "list")
 
     /**

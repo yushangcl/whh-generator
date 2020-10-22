@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Id;
+import java.math.BigDecimal;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -30,13 +31,13 @@ import java.util.Date;
 public class ${tableInfo.beanName} implements Serializable {
 #foreach($field in ${tableInfo.tableFields})
 
-    #if(${field.filed} == "type")
+    #if(${field.needEnum} == "type")
     /**
     * ${field.comment}
     *
     * @see ${enumPackage}.${tableInfo.beanName}TypeEnum
     **/
-    #elseif(${field.filed} == "status")
+    #elseif(${field.needEnum} == "status")
     /**
     * ${field.comment}
     *
