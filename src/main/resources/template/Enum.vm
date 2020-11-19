@@ -3,7 +3,7 @@ package ${enumPackage};
 import lombok.Getter;
 
 /**
- * ${tableInfo.beanName}${enum}  ${tableInfo.tableComment}枚举
+ * ${tableInfo.beanName}${enum}  ${comment}
  *
  * @author ${authorName} (;￢＿￢) 
  * @version ${version}
@@ -11,12 +11,20 @@ import lombok.Getter;
  **/
 @Getter
 public enum ${tableInfo.beanName}${enum}Enum {
+#if(!$enumTypes)
 
     /**
-     * 枚举
-     */
+    * 枚举
+    */
     ENUMS(0, "枚举"),
+#end
+#foreach($data in $enumTypes)
 
+    /**
+     * ${data.value}
+     */
+    ${data.desc}(${data.key}, "${data.value}"),
+#end
     ;
 
     /**

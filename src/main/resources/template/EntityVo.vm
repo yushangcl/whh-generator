@@ -3,6 +3,12 @@ package ${voPackage};
 import com.fasterxml.jackson.annotation.JsonFormat;
 import ${commonPackage}.util.DateUtil;
 import ${beanPackage}.${tableInfo.beanName};
+#if(${field.needEnum} == "status")
+import ${enumPackage}.${tableInfo.beanName}${field.upFiled}Enum
+#end
+#if(${field.needEnum} == "type")
+import ${enumPackage}.${tableInfo.beanName}${field.upFiled}Enum
+#end
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.collections4.CollectionUtils;
@@ -47,6 +53,8 @@ public class ${tableInfo.beanName}Vo extends ${tableInfo.beanName} {
 
     /**
     * 显示${field.comment}
+    *
+    * @see ${enumPackage}.${tableInfo.beanName}${field.upFiled}Enum
     **/
     private String ${field.property}Desc;
     #end
@@ -54,6 +62,8 @@ public class ${tableInfo.beanName}Vo extends ${tableInfo.beanName} {
 
     /**
     * 显示${field.comment}
+    *
+    * @see ${enumPackage}.${tableInfo.beanName}${field.upFiled}Enum
     **/
     private String ${field.property}Desc;
     #end
@@ -115,10 +125,10 @@ public class ${tableInfo.beanName}Vo extends ${tableInfo.beanName} {
             this.setUpdateTimeDesc(DateUtil.format(pojo.getUpdateTime(), DateUtil.YYMMDD));
 #foreach($field in ${tableInfo.tableFields})
     #if(${field.needEnum} == "status")
-            this.set${field.upFiled}Desc(BiddingEntryStatusEnum.findNameByCode(pojo.get${field.upFiled}()));
+            this.set${field.upFiled}Desc(${tableInfo.beanName}${field.upFiled}Enum.findNameByCode(pojo.get${field.upFiled}()));
     #end
     #if(${field.needEnum} == "type")
-            this.set${field.upFiled}Desc(BiddingEntryStatusEnum.findNameByCode(pojo.get${field.upFiled}()));
+            this.set${field.upFiled}Desc(${tableInfo.beanName}${field.upFiled}Enum.findNameByCode(pojo.get${field.upFiled}()));
     #end
 #end
         }

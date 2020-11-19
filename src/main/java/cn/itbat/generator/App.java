@@ -11,9 +11,9 @@ import cn.itbat.generator.plugin.EasyGenerator;
 public class App {
     public static void main(String[] args) {
         EasyGenerator easyGenerator = new EasyGenerator();
-//        easyGenerator.execute(EasyGenerator.TypeEnum.all);
+        easyGenerator.execute(EasyGenerator.TypeEnum.all);
 //        easyGenerator.execute(EasyGenerator.TypeEnum.mapper);
-        easyGenerator.execute(EasyGenerator.TypeEnum.update);
+//        easyGenerator.execute(EasyGenerator.TypeEnum.update);
 //        easyGenerator.execute(EasyGenerator.TypeEnum.criteria);
     }
 }

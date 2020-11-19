@@ -1,10 +1,12 @@
 package cn.itbat.generator.plugin;
 
 import cn.itbat.generator.enums.DbColumnTypeEnum;
+import cn.itbat.generator.model.EnumsField;
 import cn.itbat.generator.model.TableField;
 import cn.itbat.generator.model.TableInfo;
 import cn.itbat.generator.utils.DateUtil;
 import cn.itbat.generator.utils.OSTypeUtil;
+import cn.itbat.generator.utils.TranslationUtil;
 import cn.itbat.generator.utils.VelocityUtil;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -272,10 +274,48 @@ public class EasyGenerator {
         context.put("tableInfo", tableInfo);
         for (TableField tableField : tableInfo.getTableFields()) {
             if (tableField.getFiled().contains("status") || tableField.getFiled().contains("Status") || tableField.getFiled().contains("type") || tableField.getFiled().contains("Type")) {
+                // 解析注释，格式：'类型：1-公众号；2-小程序'
+                String comment = tableField.getComment();
+                context.put("enumTypes", getEnumValue(comment));
+                context.put("comment", comment);
                 context.put("enum", processFieldUp(processField(tableField.getFiled())));
                 VelocityUtil.generate("template/Enum.vm", enumsPath + "\\" + tableInfo.getBeanName() + processFieldUp(processField(tableField.getFiled())) + "Enum.java", context);
             }
         }
+    }
+
+    private List<EnumsField> getEnumValue(String comment) {
+        List<EnumsField> enumsFields = new ArrayList<>();
+        if (!StringUtils.isEmpty(comment)) {
+            if (comment.contains("：")) {
+                String[] split = comment.split("：");
+                if (split.length > 1) {
+                    if (split[1].contains("；")) {
+                        String[] split1 = split[1].split("；");
+                        for (String s : split1) {
+                            if (s.contains("-")) {
+                                String[] split2 = s.split("-");
+                                enumsFields.add(EnumsField.builder().key(split2[0]).value(split2[1]).desc(toEnumerateValue(TranslationUtil.translation(split2[1]))).build());
+                            }
+                        }
+                    } else {
+                        if (split[1].contains("-")) {
+                            String[] split2 = split[1].split("-");
+                            enumsFields.add(EnumsField.builder().key(split2[0]).value(split2[1]).desc(toEnumerateValue(TranslationUtil.translation(split2[1]))).build());
+                        }
+                    }
+                }
+            }
+        }
+        return enumsFields;
+    }
+
+    private String toEnumerateValue(String s) {
+        if (StringUtils.isBlank(s)) {
+            return "";
+        }
+        String replace = s.replace(" ", "_").replace(",", "").replace(".", "");
+        return replace.toUpperCase();
     }
 
     /**

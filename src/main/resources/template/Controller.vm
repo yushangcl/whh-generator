@@ -70,6 +70,8 @@ public class ${tableInfo.beanName}Controller {
      */
     @PostMapping("/export")
     public void export(${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo, Pager pager, HttpServletResponse response) {
+        pager.setPageIndex(1);
+        pager.setPageSize(Integer.MAX_VALUE);
         //查询数据
         PageInfo<${tableInfo.beanName}Vo> pageInfo = ${tableInfo.shortBeanName}Service.list(${tableInfo.shortBeanName}Vo, pager);
         ExcelCommonUtils.exportCommonNew("${tableInfo.tableComment}", "序号", pageInfo.getList(), ${tableInfo.beanName}Vo.class, response, null);

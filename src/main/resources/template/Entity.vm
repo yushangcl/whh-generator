@@ -35,13 +35,13 @@ public class ${tableInfo.beanName} implements Serializable {
     /**
     * ${field.comment}
     *
-    * @see ${enumPackage}.${tableInfo.beanName}TypeEnum
+    * @see ${enumPackage}.${tableInfo.beanName}${field.upFiled}Enum
     **/
     #elseif(${field.needEnum} == "status")
     /**
     * ${field.comment}
     *
-    * @see ${enumPackage}.${tableInfo.beanName}StatusEnum
+    * @see ${enumPackage}.${tableInfo.beanName}${field.upFiled}Enum
     **/
     #else
     /**
