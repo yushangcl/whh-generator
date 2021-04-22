@@ -263,7 +263,7 @@ public class ${tableInfo.beanName}ServiceImpl extends BaseScsServiceSupport<${ta
             ${tableInfo.beanName}Vo ${tableInfo.shortBeanName}Vo = new ${tableInfo.beanName}Vo(${tableInfo.shortBeanName});
             // 创建人
             ${tableInfo.shortBeanName}Vo.setCreateUserDesc(userVoMap.get(${tableInfo.shortBeanName}.getCreateUser()) == null ? null : userVoMap.get(${tableInfo.shortBeanName}.getCreateUser()).getUserName());
-            ${tableInfo.shortBeanName}Vo.setUpdateUserDesc(userVoMap.get(${tableInfo.shortBeanName}.getCreateUser()) == null ? null : userVoMap.get(${tableInfo.shortBeanName}.getUpdateUser()).getUserName());
+            ${tableInfo.shortBeanName}Vo.setUpdateUserDesc(userVoMap.get(${tableInfo.shortBeanName}.getUpdateUser()) == null ? null : userVoMap.get(${tableInfo.shortBeanName}.getUpdateUser()).getUserName());
    #foreach($field in ${tableInfo.tableFields})
        #if(${field.filed} == "skuId")
             // sku信息

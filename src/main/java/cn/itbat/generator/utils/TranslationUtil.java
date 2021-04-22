@@ -35,9 +35,9 @@ public class TranslationUtil {
 
     private static final String YOU_DAO_URL = "https://openapi.youdao.com/api";
 
-    private static final String APP_KEY = "";
+    private static final String APP_KEY = "2573f3ed0bac7e14";
 
-    private static final String APP_SECRET = "";
+    private static final String APP_SECRET = "XAk4aAD2edJXOm36SisT9aUaGqV2k9rj";
 
     public static String translation(String str) {
         // 处理结果

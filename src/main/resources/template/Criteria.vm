@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import com.runlion.scs.common.service.BaseCriteria;
+
 /**
  * ${tableInfo.beanName}Criteria
  *
@@ -12,7 +14,7 @@ import java.util.List;
 * @version ${version}
 * @date $date
  **/
-public class ${tableInfo.beanName}Criteria {
+public class ${tableInfo.beanName}Criteria extends BaseCriteria {
 
     protected String orderByClause;
 

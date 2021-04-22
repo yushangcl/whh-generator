@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import ${commonPackage}.util.json.serializer.LongJsonDeserializer;
 import ${commonPackage}.util.json.serializer.LongJsonSerializer;
 import lombok.AllArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,7 @@ import java.util.Date;
  * @date $date
  **/
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ${tableInfo.beanName} implements Serializable {

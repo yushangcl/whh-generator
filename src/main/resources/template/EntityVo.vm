@@ -9,6 +9,7 @@ import ${enumPackage}.${tableInfo.beanName}${field.upFiled}Enum
 #if(${field.needEnum} == "type")
 import ${enumPackage}.${tableInfo.beanName}${field.upFiled}Enum
 #end
+import lombok.experimental.SuperBuilder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.collections4.CollectionUtils;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
  * @version ${version}
  * @date $date
  **/
+@SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class ${tableInfo.beanName}Vo extends ${tableInfo.beanName} {
