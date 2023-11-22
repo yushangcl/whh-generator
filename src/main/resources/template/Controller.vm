@@ -1,8 +1,8 @@
 package ${controllerPackage};
 
 import com.github.pagehelper.PageInfo;
-import ${base_package}.basics.annotation.SysLog;
-import ${commonPackage}.entity.Pager;
+import com.runlion.xcs.excel.annotation.SysLog;
+import com.runlion.xcs.tools.base.Pager;
 #foreach($method in ${tableInfo.methods})
     #if(${method} == "export")
 import ${commonPackage}.constants.CommonConstant;

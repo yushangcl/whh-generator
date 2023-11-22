@@ -504,7 +504,7 @@ public class EasyGenerator {
                         buildCriteria();
                         buildEntityBean();
 //                        buildMapper();
-                        buildMapperXml();
+//                        buildMapperXml();
 //                        buildEnum();
                         break;
                     default:

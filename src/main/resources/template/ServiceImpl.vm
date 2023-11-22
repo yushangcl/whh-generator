@@ -17,12 +17,12 @@ import ${base_package}.common.exception.BaseException;
 import ${commonPackage}.service.BaseScsServiceSupport;
 import ${commonPackage}.util.user.UserInfoUtil;
 #if($lock)
-import ${commonPackage}.redisson.lock.LockManagerAnnotation;
+import ${commonPackage}.redisson.lock.LockManager;
 import ${commonPackage}.redisson.lock.LockManagerUtil;
 #end
 import ${base_package}.admin.api.SysUserApi;
-import ${base_package}.admin.base.vo.UserVo;
-import ${commonPackage}.entity.Pager;
+import ${base_package}.common.vo.UserVo;
+import com.runlion.xcs.tools.base.Pager;
 
 import ${base_package}.${model}.base.criteria.${tableInfo.beanName}Criteria;
 #foreach($field in ${tableInfo.tableFields})
@@ -351,7 +351,7 @@ public class ${tableInfo.beanName}ServiceImpl extends BaseScsServiceSupport<${ta
     #end
     #if(${method} == "save")
     #if($lock)
-    @LockManagerAnnotation()
+    @LockManager()
     #end
     @Transactional(rollbackFor = Exception.class)
     @Override

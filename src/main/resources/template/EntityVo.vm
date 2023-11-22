@@ -9,9 +9,9 @@ import ${enumPackage}.${tableInfo.beanName}${field.upFiled}Enum
 #if(${field.needEnum} == "type")
 import ${enumPackage}.${tableInfo.beanName}${field.upFiled}Enum
 #end
-import lombok.experimental.SuperBuilder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * @version ${version}
  * @date $date
  **/
-@SuperBuilder
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class ${tableInfo.beanName}Vo extends ${tableInfo.beanName} {

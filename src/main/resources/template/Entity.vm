@@ -3,13 +3,10 @@ package ${beanPackage};
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import ${commonPackage}.util.json.serializer.LongJsonDeserializer;
-import ${commonPackage}.util.json.serializer.LongJsonSerializer;
-import lombok.AllArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import lombok.Builder;
+import com.runlion.xcs.bean.annotation.LongJsonDeserializer;
+import com.runlion.xcs.bean.annotation.LongJsonSerializer;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -26,9 +23,7 @@ import java.util.Date;
  * @date $date
  **/
 @Data
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
+@Accessors(chain = true)
 public class ${tableInfo.beanName} implements Serializable {
 #foreach($field in ${tableInfo.tableFields})
 
@@ -61,7 +56,6 @@ public class ${tableInfo.beanName} implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     #end
     #if(${field.filed} == "deleted")
-    @Builder.Default
     private ${field.type} ${field.property} = 0;
     #end
     #if(${field.filed} != "deleted")

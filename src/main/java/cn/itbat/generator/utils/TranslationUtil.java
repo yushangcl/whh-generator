@@ -102,6 +102,9 @@ public class TranslationUtil {
                 JSONObject jsonObject = JSONObject.parseObject(json);
                 JSONArray jsonArray = jsonObject.getJSONArray("translation");
                 System.out.println("翻译文字：" + params.get("q") + "；翻译结果：" + jsonObject.getJSONArray("translation"));
+                if (jsonObject.getJSONArray("translation") == null){
+                    return params.get("q");
+                }
                 return jsonArray.getString(0);
             }
         } finally {

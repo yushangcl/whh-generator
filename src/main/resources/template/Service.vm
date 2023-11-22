@@ -1,7 +1,7 @@
 package ${servicePackage};
 
 import com.github.pagehelper.PageInfo;
-import ${commonPackage}.entity.Pager;
+import com.runlion.xcs.tools.base.Pager;
 import ${commonPackage}.service.ScsService;
 import ${beanPackage}.${tableInfo.beanName};
 import ${voPackage}.${tableInfo.beanName}Vo;
